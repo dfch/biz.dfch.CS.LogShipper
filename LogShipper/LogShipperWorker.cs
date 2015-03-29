@@ -15,33 +15,103 @@ using System.Management;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace biz.dfch.CS.LogShipper
 {
-    class LogShipperWorker
+    public class LogShipperWorker
     {
-        private bool _active = true;
+        private bool _fInitialised = false;
+        private bool _active = false;
+        private FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
+        private String _path;
+        private String _filter;
         private Timer _stateTimer = null;
 
         public bool Active
         {
             get { return _active; }
-            set { _active = value; }
+            set 
+            {
+                if(!_fInitialised)
+                {
+                    throw new InvalidOperationException(String.Format("LogShipperWorker not initialised. Cannot modify property 'Active'."));
+                }
+                _active = value;
+                _fileSystemWatcher.EnableRaisingEvents = value;
+            }
         }
         //public LogShipperWorker(string Uri, string ManagementUri, int UpdateIntervalMinutes, int ServerNotReachableRetries)
         public LogShipperWorker()
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+        }
+        public LogShipperWorker(String path, String filter)
+        {
+            Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            var fReturn = false;
+            fReturn = this.Initialise(path, filter);
+        }
 
-            //this.Initialise(Uri, ManagementUri, UpdateIntervalMinutes, ServerNotReachableRetries, true);
+        private bool Initialise(String path, String filter)
+        {
+            var fReturn = false;
+            try
+            {
+                // Parameter validation
+                if (null == path || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("path", String.Format("path: Parameter validation FAILED. Parameter cannot be null or empty."));
+                if (null == filter || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("filter", String.Format("filter: Parameter validation FAILED. Parameter cannot be null or empty."));
+
+                if(_fInitialised)
+                {
+                    Stop();
+                }
+                _fileSystemWatcher.Path = (_path = path);
+                _fileSystemWatcher.Filter = (_filter = filter);
+                _fileSystemWatcher.NotifyFilter =
+                    NotifyFilters.LastAccess |
+                    NotifyFilters.LastWrite |
+                    NotifyFilters.FileName |
+                    NotifyFilters.DirectoryName |
+                    NotifyFilters.CreationTime;
+                _fileSystemWatcher.Created += new FileSystemEventHandler(OnEvent);
+                _fileSystemWatcher.Changed += new FileSystemEventHandler(OnEvent);
+                _fileSystemWatcher.Renamed += new RenamedEventHandler(OnRenamed);
+                _fileSystemWatcher.Deleted += new FileSystemEventHandler(OnEvent);
+                _fileSystemWatcher.Error += new ErrorEventHandler(OnError);
+                _fInitialised = true;
+                this.Active = true;
+                fReturn = _fInitialised;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace);
+                throw ex;
+            }
+            return fReturn;
         }
         public bool Update()
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
+            return this.Active;
+        }
+        public bool Update(String path, String filter)
+        {
+            Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
             var fReturn = false;
-            if (!_active) return fReturn;
-            return _active;
+
+            // Parameter validation
+            if (null == path || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("path", String.Format("path: Parameter validation FAILED. Parameter cannot be null or empty."));
+            if (null == filter || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("filter", String.Format("filter: Parameter validation FAILED. Parameter cannot be null or empty."));
+
+            Stop();
+            _path = path;
+            _filter = filter;
+            fReturn = Start();
+
+            return fReturn;
         }
 
         private static void OnEvent(object source, FileSystemEventArgs e)
@@ -59,69 +129,29 @@ namespace biz.dfch.CS.LogShipper
             Debug.WriteLine("{0} : {1} : {2}", e.GetException().ToString(), e.GetType().ToString(), e.ToString());
         }
 
-        public bool Run()
+        public void Stop()
         {
-            bool fReturn = false;
-
-
-            var fileSystemWatcher = new FileSystemWatcher();
-            fileSystemWatcher.Path = "C:\\Logs\\biz.dfch.PS.System.Logging\\2015-03";
-            fileSystemWatcher.Filter = "*.log";
-            fileSystemWatcher.NotifyFilter = 
-                NotifyFilters.LastAccess | 
-                NotifyFilters.LastWrite | 
-                NotifyFilters.FileName | 
-                NotifyFilters.DirectoryName | 
-                NotifyFilters.CreationTime;
-            fileSystemWatcher.Created += new FileSystemEventHandler(OnEvent);
-            fileSystemWatcher.Changed += new FileSystemEventHandler(OnEvent);
-            fileSystemWatcher.Renamed += new RenamedEventHandler(OnRenamed);
-            fileSystemWatcher.Deleted += new FileSystemEventHandler(OnEvent);
-            fileSystemWatcher.Error += new ErrorEventHandler(OnError);
-            fileSystemWatcher.EnableRaisingEvents = true;
-
-            //var fileName = "C:\\Logs\\biz.dfch.PS.System.Logging\\2015-03\\2015-03-28.log";
-            //using (StreamReader streamReader = new StreamReader(
-            //        new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            //    ))
-            //{
-            //    //var msg = string.Format("{0}:{1}.{2} streamReader", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            //    //Debug.WriteLine(msg);
-
-            //    var lastMaxOffset = streamReader.BaseStream.Length;
-            //    while (true)
-            //    {
-            //        //TODO change to FileSystemWatcher
-            //        System.Threading.Thread.Sleep(100);
-
-            //        // check if file has changed - obsolete when using FileSystemWatcher
-            //        if (streamReader.BaseStream.Length == lastMaxOffset)
-            //        {
-            //            continue;
-            //        }
-
-            //        // seek to the last read file pointer (always from the beginning)
-            //        streamReader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
-
-            //        // read all lines
-            //        var line = "";
-            //        while (null != (line = streamReader.ReadLine()))
-            //        {
-            //            Console.WriteLine(line);
-            //        }
-
-            //        // update to last read offset
-            //        lastMaxOffset = streamReader.BaseStream.Position;
-            //    }
-            //}
-
-            fReturn = true;
-            return fReturn;
+            this.Active = false;
         }
+
+        public bool Start()
+        {
+            this.Active = true;
+            return this.Active;
+        }
+        public bool Start(String path, String filter)
+        {
+            return this.Initialise(path, filter);
+        }
+
         ~LogShipperWorker()
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
+            if (null != _fileSystemWatcher)
+            {
+                _fileSystemWatcher.Dispose();
+            }
             if (null != _stateTimer)
             {
                 _stateTimer.Dispose();

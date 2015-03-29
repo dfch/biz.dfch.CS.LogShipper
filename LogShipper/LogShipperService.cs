@@ -65,7 +65,9 @@ namespace biz.dfch.CS.LogShipper
 
                 //_worker = new ScheduledTaskWorker(Uri, ManagementUri, UpdateIntervalMinutes, ServerNotReachableRetries);
                 _worker = new LogShipperWorker();
-                _worker.Run();
+                String path = "C:\\Logs\\biz.dfch.PS.System.Logging\\2015-03";
+                String filter = "*.log";
+                _worker.Start(path, filter);
             }
             catch (Exception ex)
             {
@@ -81,7 +83,7 @@ namespace biz.dfch.CS.LogShipper
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-            _worker.Active = false;
+            _worker.Stop();
 
             base.OnStop();
         }
@@ -89,7 +91,7 @@ namespace biz.dfch.CS.LogShipper
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-            _worker.Active = false;
+            _worker.Stop();
 
             base.OnPause();
         }
@@ -97,8 +99,8 @@ namespace biz.dfch.CS.LogShipper
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-            _worker.Active = true;
             _worker.Update();
+            _worker.Start();
 
             base.OnContinue();
         }
@@ -118,7 +120,7 @@ namespace biz.dfch.CS.LogShipper
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-            _worker.Active = false;
+            _worker.Stop();
 
             base.OnShutdown();
         }
