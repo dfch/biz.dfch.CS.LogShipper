@@ -109,6 +109,45 @@ namespace biz.dfch.CS.LogShipperTests
             fReturn = worker.Start();
             Assert.AreEqual(true, fReturn);
         }
+        [TestMethod]
+        public void doUpdateReturnsFalse()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var fReturn = worker.Update();
+            Assert.AreEqual(false, fReturn);
+        }
+        [TestMethod]
+        public void doUpdateReturnsTrue()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
+            fReturn = worker.Update();
+            Assert.AreEqual(true, fReturn);
+        }
+        [TestMethod]
+        public void doUpdateWithPathReturnsTrue()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
+            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+            Assert.AreEqual(true, fReturn);
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void doUpdateEmptyThrowsArgumentNullException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var fReturn = worker.Start("", "");
+            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void doUpdateNullThrowsArgumentNullException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var fReturn = worker.Start(null, null);
+            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+        }
     }
 }
 
