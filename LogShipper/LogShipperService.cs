@@ -67,7 +67,7 @@ namespace biz.dfch.CS.LogShipper
                 _worker = new LogShipperWorker();
                 String path = "C:\\Logs\\biz.dfch.PS.System.Logging\\2015-03";
                 String filter = "*.log";
-                _worker.Start(path, filter);
+                _worker.Start(path);
             }
             catch (Exception ex)
             {

@@ -2,11 +2,16 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 
+using System.Management;
+using System.Management.Automation;
+
 using biz.dfch.CS.LogShipper;
 
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "LogShipperTests.dll.config", Watch = true)]
 namespace biz.dfch.CS.LogShipperTests
 {
     [TestClass]
+    [DeploymentItem("LogShipperTests.dll.config")]
     public class UnitTest1
     {
         private TestContext _testContext;
@@ -22,6 +27,11 @@ namespace biz.dfch.CS.LogShipperTests
             }
         }
 
+        [AssemblyInitialize]
+        public static void Configure(TestContext testContext)
+        {
+            log4net.Config.XmlConfigurator.Configure();
+        }
         [ClassInitialize()]
         public static void classInitialize(TestContext testContext)
         {
@@ -37,7 +47,7 @@ namespace biz.dfch.CS.LogShipperTests
         [TestInitialize()]
         public void testInitialize()
         {
-            Debug.WriteLine("testInitialize.");
+            Trace.WriteLine("testInitialize");
         }
 
         [TestCleanup()]
@@ -70,27 +80,28 @@ namespace biz.dfch.CS.LogShipperTests
         public void doStartEmptyThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start("", "");
+            worker.Start("");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void doStartNullThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start(null, null);
+            worker.Start(null);
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(DirectoryNotFoundException))]
         public void doStartInvalidDirectoryThrowsArgumentException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start("C:\\non-existent-directory", "*.log");
+            worker.Start("C:\\non-existent-directory\\non-existant-file.log");
         }
         [TestMethod]
         public void doStartReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var fReturn = worker.Start(path);
             Assert.AreEqual(true, fReturn);
         }
         [TestMethod]
@@ -104,7 +115,8 @@ namespace biz.dfch.CS.LogShipperTests
         public void doStartStopStartReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var fReturn = worker.Start(path);
             worker.Stop();
             fReturn = worker.Start();
             Assert.AreEqual(true, fReturn);
@@ -120,7 +132,8 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var fReturn = worker.Start(path);
             fReturn = worker.Update();
             Assert.AreEqual(true, fReturn);
         }
@@ -128,8 +141,9 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateWithPathReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(Directory.GetCurrentDirectory(), "*.log");
-            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var fReturn = worker.Start(path);
+            fReturn = worker.Update(path);
             Assert.AreEqual(true, fReturn);
         }
         [TestMethod]
@@ -137,16 +151,237 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateEmptyThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start("", "");
-            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+            var fReturn = worker.Start("");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            fReturn = worker.Update(path);
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void doUpdateNullThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(null, null);
-            fReturn = worker.Update(Directory.GetCurrentDirectory(), "*.log");
+            var fReturn = worker.Start(null);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            fReturn = worker.Update(path);
+        }
+        [TestMethod]
+        public void doAppendText()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var fReturn = worker.Start(tempFile);
+            System.Threading.Thread.Sleep(1000);
+            try
+            {
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+                    streamWriter.WriteLine("This is the first line of text.");
+                    streamWriter.Flush();
+                    if (!File.Exists(tempFile))
+                    {
+                        throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                    streamWriter.WriteLine("This is the second line of text.");
+                    streamWriter.Flush();
+                    System.Threading.Thread.Sleep(1000);
+                    streamWriter.WriteLine("This is the third line of text.");
+                    streamWriter.Flush();
+                    System.Threading.Thread.Sleep(1000);
+                }
+                System.Threading.Thread.Sleep(5000);
+                worker.Stop();
+                System.Threading.Thread.Sleep(5000);
+            }
+            finally
+            {
+                if(null != tempFile) File.Delete(tempFile);
+                if (File.Exists(tempFile))
+                {
+                    throw new FileNotFoundException(String.Format("tempFile: File exists. Delete operation FAILED."), tempFile);
+                }
+            }
+        }
+        [TestMethod]
+        public void doAppendText2()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var fReturn = worker.Start(tempFile);
+            try
+            {
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+                    streamWriter.WriteLine("This is the first line of text.");
+                    streamWriter.Flush();
+                    if (!File.Exists(tempFile))
+                    {
+                        throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                    streamWriter.WriteLine("This is the second line of text.");
+                    streamWriter.Flush();
+                    System.Threading.Thread.Sleep(1000);
+                    streamWriter.WriteLine("This is the third line of text.");
+                    streamWriter.Flush();
+                    System.Threading.Thread.Sleep(1000);
+                }
+                System.Threading.Thread.Sleep(5000);
+                worker.Stop();
+                System.Threading.Thread.Sleep(5000);
+            }
+            finally
+            {
+                if (null != tempFile) File.Delete(tempFile);
+                if (File.Exists(tempFile))
+                {
+                    throw new FileNotFoundException(String.Format("tempFile: File exists. Delete operation FAILED."), tempFile);
+                }
+            }
+        }
+        [TestMethod]
+        public void doRenameFile()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var newFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var fReturn = worker.Start(tempFile);
+            try
+            {
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+                    streamWriter.WriteLine("This is a line of text on the original file name.");
+                    streamWriter.Flush();
+
+                    if (!File.Exists(tempFile))
+                    {
+                        throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
+                    }
+                }
+
+                File.Move(tempFile, newFile);
+
+                if (!File.Exists(newFile))
+                {
+                    throw new FileNotFoundException(String.Format("newFile: File not found. Rename operation FAILED."), newFile);
+                }
+
+                using (StreamWriter streamWriter = File.AppendText(newFile))
+                {
+                    streamWriter.WriteLine("This is a line of text on the new file name.");
+                    streamWriter.Flush();
+                }
+            }
+            finally
+            {
+                if (null != tempFile) File.Delete(tempFile);
+                if (File.Exists(tempFile))
+                {
+                    throw new FileNotFoundException(String.Format("tempFile: File exists. Delete operation FAILED."), tempFile);
+                }
+
+                if (null != newFile) File.Delete(newFile);
+                if (File.Exists(newFile))
+                {
+                    throw new FileNotFoundException(String.Format("newFile: File exists. Delete operation FAILED."), newFile);
+                }
+            }
+        }
+        [TestMethod]
+        public void doAppendManyLines()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var fReturn = worker.Start(tempFile);
+            System.Threading.Thread.Sleep(1000);
+            try
+            {
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+                    streamWriter.WriteLine("{0} - This is a line of text.", "FirstLine");
+                    streamWriter.Flush();
+                    //streamWriter.Close();
+                    if (!File.Exists(tempFile))
+                    {
+                        throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
+                    }
+                }
+                System.Threading.Thread.Sleep(1000);
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+
+                    for (var c = 1000; c < 1200; c++)
+                    {
+                        streamWriter.WriteLine("{0} - This is a line of text.", c);
+                        streamWriter.Flush();
+                    }
+                    streamWriter.WriteLine("{0} - This is a line of text.", "LastLine");
+                    streamWriter.Flush();
+                }
+                System.Diagnostics.Trace.WriteLine("WriteLine completed.");
+                System.Threading.Thread.Sleep(1000);
+                worker.Stop();
+            }
+            finally
+            {
+                if (null != tempFile) File.Delete(tempFile);
+                if (File.Exists(tempFile))
+                {
+                    throw new FileNotFoundException(String.Format("tempFile: File exists. Delete operation FAILED."), tempFile);
+                }
+            }
+        }
+        [TestMethod]
+        [ExpectedException(typeof(TimeoutException))]
+        public void doAppendManyLinesExpectTimeoutException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
+            var fReturn = worker.Start(tempFile);
+            System.Threading.Thread.Sleep(1000);
+            try
+            {
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+                    streamWriter.WriteLine("{0} - This is a line of text.", -1);
+                    streamWriter.Flush();
+                    //streamWriter.Close();
+                    if (!File.Exists(tempFile))
+                    {
+                        throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
+                    }
+                }
+                System.Threading.Thread.Sleep(1000);
+                using (StreamWriter streamWriter = File.AppendText(tempFile))
+                {
+
+                    for (var c = 1000; c < 1500; c++)
+                    {
+                        streamWriter.WriteLine("{0} - This is a line of text.", c);
+                        streamWriter.Flush();
+                    }
+                }
+                System.Diagnostics.Trace.WriteLine("WriteLine completed.");
+                System.Threading.Thread.Sleep(1000);
+                worker.Stop();
+            }
+            finally
+            {
+                if (null != tempFile) File.Delete(tempFile);
+                if (File.Exists(tempFile))
+                {
+                    throw new FileNotFoundException(String.Format("tempFile: File exists. Delete operation FAILED."), tempFile);
+                }
+            }
+        }
+        [TestMethod]
+        public void doTestPowershellCreate()
+        {
+            for(var c = 0; c < 1000*1000*10; c++)
+            {
+                 PowerShell ps = PowerShell.Create();
+            }
         }
     }
 }
