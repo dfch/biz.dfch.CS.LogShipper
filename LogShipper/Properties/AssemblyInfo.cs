@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("d-fens GmbH")]
 [assembly: AssemblyProduct("LogShipper")]
 [assembly: AssemblyCopyright("Copyright ©  2015 Ronald Rink, d-fens GmbH")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("The d-fens logo is a registered trademark in the European Union and or other countries.")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

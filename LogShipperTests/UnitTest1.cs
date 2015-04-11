@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-
+using System.Configuration;
 using System.Management;
 using System.Management.Automation;
 
@@ -14,7 +14,7 @@ namespace biz.dfch.CS.LogShipperTests
     [DeploymentItem("LogShipperTests.dll.config")]
     public class UnitTest1
     {
-        private TestContext _testContext;
+        private static TestContext _testContext;
         public TestContext testContext
         {
             get
@@ -35,6 +35,7 @@ namespace biz.dfch.CS.LogShipperTests
         [ClassInitialize()]
         public static void classInitialize(TestContext testContext)
         {
+            _testContext = testContext;
             Trace.WriteLine(String.Format("classInitialize: '{0}'", testContext.TestName));
         }
 
@@ -80,28 +81,51 @@ namespace biz.dfch.CS.LogShipperTests
         public void doStartEmptyThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start("");
+            worker.Start("", "");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void doStartNullThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start(null);
+            worker.Start(null, null);
         }
         [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
-        public void doStartInvalidDirectoryThrowsArgumentException()
+        public void doStartInvalidDirectoryThrowsDirectoryNotFoundException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            worker.Start("C:\\non-existent-directory\\non-existant-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            worker.Start("C:\\non-existent-directory\\non-existant-file.log", scriptFile);
+        }
+        [TestMethod]
+        [ExpectedException(typeof(FileNotFoundException))]
+        public void doStartInvalidScriptFileThrowsFileNotFoundException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            worker.Start("C:\\non-existent-directory\\non-existant-file.log", "C:\\non-existent-directory\\non-existant-file.ps1");
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void doStartInvalidFileNameThrowsArgumentException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            worker.Start("C:\\irrelevant-directory\\irrelevant-file.log", "invalid-file-???.ps1");
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void doStartInvalidDirectoryNameThrowsArgumentException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            worker.Start("C:\\invalid-directory-\t\\irrelevant-file.log", scriptFile);
         }
         [TestMethod]
         public void doStartReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            var fReturn = worker.Start(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var fReturn = worker.Start(logFile, System.Configuration.ConfigurationManager.AppSettings["ScriptFile"]);
             Assert.AreEqual(true, fReturn);
         }
         [TestMethod]
@@ -115,8 +139,9 @@ namespace biz.dfch.CS.LogShipperTests
         public void doStartStopStartReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            var fReturn = worker.Start(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
             worker.Stop();
             fReturn = worker.Start();
             Assert.AreEqual(true, fReturn);
@@ -132,8 +157,9 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            var fReturn = worker.Start(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
             fReturn = worker.Update();
             Assert.AreEqual(true, fReturn);
         }
@@ -141,9 +167,10 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateWithPathReturnsTrue()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            var fReturn = worker.Start(path);
-            fReturn = worker.Update(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
+            fReturn = worker.Update(logFile, scriptFile);
             Assert.AreEqual(true, fReturn);
         }
         [TestMethod]
@@ -151,25 +178,46 @@ namespace biz.dfch.CS.LogShipperTests
         public void doUpdateEmptyThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start("");
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            fReturn = worker.Update(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
+            fReturn = worker.Update("", "");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void doUpdateNullThrowsArgumentNullException()
         {
             LogShipperWorker worker = new LogShipperWorker();
-            var fReturn = worker.Start(null);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
-            fReturn = worker.Update(path);
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
+            fReturn = worker.Update(null, null);
+        }
+        [ExpectedException(typeof(DirectoryNotFoundException))]
+        public void doUpdateInvalidDirectoryThrowsDirectoryNotFoundException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
+            fReturn = worker.Update("C:\\non-existent-directory\\non-existant-file.log", scriptFile);
+        }
+        [ExpectedException(typeof(FileNotFoundException))]
+        public void doUpdateInvalidScriptFileThrowsFileNotFoundException()
+        {
+            LogShipperWorker worker = new LogShipperWorker();
+            var logFile = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(logFile, scriptFile);
+            fReturn = worker.Update(logFile, "C:\\non-existent-directory\\non-existant-file.ps1");
         }
         [TestMethod]
         public void doAppendText()
         {
             LogShipperWorker worker = new LogShipperWorker();
             var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
-            var fReturn = worker.Start(tempFile);
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(tempFile, scriptFile);
             System.Threading.Thread.Sleep(1000);
             try
             {
@@ -183,15 +231,10 @@ namespace biz.dfch.CS.LogShipperTests
                     }
                     System.Threading.Thread.Sleep(1000);
                     streamWriter.WriteLine("This is the second line of text.");
-                    streamWriter.Flush();
-                    System.Threading.Thread.Sleep(1000);
                     streamWriter.WriteLine("This is the third line of text.");
                     streamWriter.Flush();
-                    System.Threading.Thread.Sleep(1000);
                 }
-                System.Threading.Thread.Sleep(5000);
                 worker.Stop();
-                System.Threading.Thread.Sleep(5000);
             }
             finally
             {
@@ -207,7 +250,8 @@ namespace biz.dfch.CS.LogShipperTests
         {
             LogShipperWorker worker = new LogShipperWorker();
             var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
-            var fReturn = worker.Start(tempFile);
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(tempFile, scriptFile);
             try
             {
                 using (StreamWriter streamWriter = File.AppendText(tempFile))
@@ -220,15 +264,11 @@ namespace biz.dfch.CS.LogShipperTests
                     }
                     System.Threading.Thread.Sleep(1000);
                     streamWriter.WriteLine("This is the second line of text.");
-                    streamWriter.Flush();
-                    System.Threading.Thread.Sleep(1000);
                     streamWriter.WriteLine("This is the third line of text.");
                     streamWriter.Flush();
-                    System.Threading.Thread.Sleep(1000);
                 }
                 System.Threading.Thread.Sleep(5000);
                 worker.Stop();
-                System.Threading.Thread.Sleep(5000);
             }
             finally
             {
@@ -246,7 +286,8 @@ namespace biz.dfch.CS.LogShipperTests
             var path = Path.Combine(Directory.GetCurrentDirectory(), "some-file.log");
             var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
             var newFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
-            var fReturn = worker.Start(tempFile);
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(tempFile, scriptFile);
             try
             {
                 using (StreamWriter streamWriter = File.AppendText(tempFile))
@@ -275,6 +316,7 @@ namespace biz.dfch.CS.LogShipperTests
             }
             finally
             {
+                worker.Stop();
                 if (null != tempFile) File.Delete(tempFile);
                 if (File.Exists(tempFile))
                 {
@@ -293,7 +335,8 @@ namespace biz.dfch.CS.LogShipperTests
         {
             LogShipperWorker worker = new LogShipperWorker();
             var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
-            var fReturn = worker.Start(tempFile);
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(tempFile, scriptFile);
             System.Threading.Thread.Sleep(1000);
             try
             {
@@ -301,7 +344,6 @@ namespace biz.dfch.CS.LogShipperTests
                 {
                     streamWriter.WriteLine("{0} - This is a line of text.", "FirstLine");
                     streamWriter.Flush();
-                    //streamWriter.Close();
                     if (!File.Exists(tempFile))
                     {
                         throw new FileNotFoundException(String.Format("tempFile: File not found. Create operation FAILED."), tempFile);
@@ -320,7 +362,6 @@ namespace biz.dfch.CS.LogShipperTests
                     streamWriter.Flush();
                 }
                 System.Diagnostics.Trace.WriteLine("WriteLine completed.");
-                System.Threading.Thread.Sleep(1000);
                 worker.Stop();
             }
             finally
@@ -334,11 +375,12 @@ namespace biz.dfch.CS.LogShipperTests
         }
         [TestMethod]
         [ExpectedException(typeof(TimeoutException))]
-        public void doAppendManyLinesExpectTimeoutException()
+        public void doAppendManyLinesThrowsTimeoutException()
         {
             LogShipperWorker worker = new LogShipperWorker();
             var tempFile = Path.Combine(Directory.GetCurrentDirectory(), String.Concat(Path.GetRandomFileName(), ".log"));
-            var fReturn = worker.Start(tempFile);
+            var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
+            var fReturn = worker.Start(tempFile, scriptFile);
             System.Threading.Thread.Sleep(1000);
             try
             {
@@ -356,7 +398,7 @@ namespace biz.dfch.CS.LogShipperTests
                 using (StreamWriter streamWriter = File.AppendText(tempFile))
                 {
 
-                    for (var c = 1000; c < 1500; c++)
+                    for (var c = 1000; c < 15000; c++)
                     {
                         streamWriter.WriteLine("{0} - This is a line of text.", c);
                         streamWriter.Flush();
@@ -375,14 +417,14 @@ namespace biz.dfch.CS.LogShipperTests
                 }
             }
         }
-        [TestMethod]
-        public void doTestPowershellCreate()
-        {
-            for(var c = 0; c < 1000*1000*10; c++)
-            {
-                 PowerShell ps = PowerShell.Create();
-            }
-        }
+        //[TestMethod]
+        //public void doTestPowershellCreate()
+        //{
+        //    for(var c = 0; c < 1000*1000*10; c++)
+        //    {
+        //         PowerShell ps = PowerShell.Create();
+        //    }
+        //}
     }
 }
 

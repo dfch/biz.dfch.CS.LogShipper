@@ -25,10 +25,10 @@ namespace biz.dfch.CS.LogShipper
         private bool _isInitialised = false;
         private volatile bool _isActive = false;
         private FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
-        private String _file;
-        private String _path;
-        private String _filter;
-        private Timer _stateTimer = null;
+        private String _logFile;
+        private String _logPath;
+        private String _logFilter;
+        private String _scriptFile;
         private Thread _thread;
         PowerShell _ps = PowerShell.Create();
 
@@ -52,35 +52,55 @@ namespace biz.dfch.CS.LogShipper
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
         }
-        public LogShipperWorker(String path)
+        public LogShipperWorker(String logFile, String scriptFile)
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             var fReturn = false;
-            fReturn = this.Initialise(path);
+            fReturn = this.Initialise(logFile, scriptFile);
         }
 
-        private bool Initialise(String path)
+        private bool Initialise(String logFile, String scriptFile)
         {
             var fReturn = false;
             try
             {
                 // Parameter validation
-                if (null == path || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("path", String.Format("path: Parameter validation FAILED. Parameter cannot be null or empty."));
-
-                _path = Path.GetDirectoryName(path);
-                if (!Directory.Exists(_path))
+                if (null == logFile || String.IsNullOrWhiteSpace(logFile)) throw new ArgumentNullException("logFile", String.Format("logFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+                if (null == scriptFile || String.IsNullOrWhiteSpace(scriptFile)) throw new ArgumentNullException("scriptFile", String.Format("scriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+                if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(scriptFile)))
                 {
-                    throw new DirectoryNotFoundException(String.Format("path: Parameter validation FAILED. File or path does not exist."));
+                    scriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(scriptFile));
                 }
-                _file = path;
-                _filter = String.Format("*{0}", Path.GetExtension(path));
+                char[] achFileName = Path.GetFileName(scriptFile).ToCharArray();
+                char[] achFileInvalidChars = Path.GetInvalidFileNameChars();
+                if('\0' != achFileName.Intersect(achFileInvalidChars).FirstOrDefault())
+                {
+                    throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", scriptFile);
+                }
+                if (!File.Exists(scriptFile)) throw new FileNotFoundException(String.Format("scriptFile: Parameter validation FAILED. File '{0}' does not exist.", scriptFile), scriptFile);
+                _scriptFile = scriptFile;
 
-                if(_isInitialised)
+                char[] achPathName = Path.GetDirectoryName(logFile).ToCharArray();
+                char[] achPathInvalidChars = Path.GetInvalidPathChars();
+                if('\0' != achPathName.Intersect(achPathInvalidChars).FirstOrDefault())
+                {
+                    throw new ArgumentException("logFile: Parameter validation FAILED. logFile path contains invalid characters.", scriptFile);
+                }
+                _logPath = Path.GetDirectoryName(logFile);
+                if (!Directory.Exists(_logPath))
+                {
+                    throw new DirectoryNotFoundException(String.Format("logFile: Parameter validation FAILED. Path '{0}' does not exist.", _logPath));
+                }
+                _logFile = logFile;
+                _logFilter = String.Format("*{0}", Path.GetExtension(logFile));
+
+
+                if (_isInitialised)
                 {
                     Stop();
                 }
-                _fileSystemWatcher.Path = _path;
-                _fileSystemWatcher.Filter = _filter;
+                _fileSystemWatcher.Path = _logPath;
+                _fileSystemWatcher.Filter = _logFilter;
                 _fileSystemWatcher.NotifyFilter =
                     NotifyFilters.LastAccess |
                     NotifyFilters.LastWrite |
@@ -94,13 +114,12 @@ namespace biz.dfch.CS.LogShipper
                 _fileSystemWatcher.Error += new ErrorEventHandler(OnError);
 
                 var ps = PowerShell
-                    .Create();
-                ps  .AddCommand("Get-Process")
-                    .Invoke();
-                ps.Dispose();
+                    .Create()
+                    .AddScript("return true;");
+                ps.Invoke();
+                ps.Commands.Clear();
 
                 _isInitialised = true;
-
                 fReturn = _isInitialised;
             }
             catch (Exception ex)
@@ -127,14 +146,34 @@ namespace biz.dfch.CS.LogShipper
             fReturn = Start();
             return this.IsActive;
         }
-        public bool Update(String path)
+        public bool Update(String logFile, String scriptFile)
         {
             Trace.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
             var fReturn = false;
 
             // Parameter validation
-            if (null == path || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("path", String.Format("path: Parameter validation FAILED. Parameter cannot be null or empty."));
+            if (null == logFile || String.IsNullOrWhiteSpace(logFile)) throw new ArgumentNullException("logFile", String.Format("logFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+            if (null == scriptFile || String.IsNullOrWhiteSpace(scriptFile)) throw new ArgumentNullException("scriptFile", String.Format("scriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+            if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(scriptFile)))
+            {
+                scriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(scriptFile));
+            }
+            char[] achFileName = Path.GetFileName(scriptFile).ToCharArray();
+            char[] achFileInvalidChars = Path.GetInvalidFileNameChars();
+            if('\0' != achFileName.Intersect(achFileInvalidChars).FirstOrDefault())
+            {
+                throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", scriptFile);
+            }
+            if (!File.Exists(scriptFile)) throw new FileNotFoundException(String.Format("scriptFile: Parameter validation FAILED. File '{0}' does not exist.", scriptFile), scriptFile);
+            _scriptFile = scriptFile;
+
+            char[] achPathName = Path.GetDirectoryName(logFile).ToCharArray();
+            char[] achPathInvalidChars = Path.GetInvalidPathChars();
+            if('\0' != achPathName.Intersect(achPathInvalidChars).FirstOrDefault())
+            {
+                throw new ArgumentException("logFile: Parameter validation FAILED. logFile path contains invalid characters.", scriptFile);
+            }
 
             fReturn = this.IsActive;
             if (!fReturn)
@@ -147,19 +186,15 @@ namespace biz.dfch.CS.LogShipper
                 return fReturn;
             }
 
-            _path = Path.GetDirectoryName(path);
-            if (!Directory.Exists(_path))
+            _logPath = Path.GetDirectoryName(logFile);
+            if (!Directory.Exists(_logPath))
             {
-                throw new FileNotFoundException(String.Format("path: Parameter validation FAILED. File or path does not exist."), path);
+                throw new DirectoryNotFoundException(String.Format("logFile: Parameter validation FAILED. Path '{0}' does not exist.", _logPath));
             }
-            _file = path;
-            var _filterTemp = String.Format("*.{0}", Path.GetExtension(path));
-            if (null == _filterTemp || String.IsNullOrWhiteSpace(path)) throw new ArgumentNullException("_filterTemp", String.Format("_filterTemp: Parameter validation FAILED. Parameter cannot be null or empty."));
+            _logFile = logFile;
+            _logFilter = String.Format("*.{0}", Path.GetExtension(logFile));
 
-            _path = path;
-            _filter = _filterTemp;
-            fReturn = Start();
-
+            fReturn = Start(_logFile, _scriptFile);
             return fReturn;
         }
 
@@ -217,7 +252,11 @@ namespace biz.dfch.CS.LogShipper
         public bool Start()
         {
             var fReturn = false;
-            if(this.IsActive)
+            if (!this._isInitialised)
+            {
+                throw new InvalidOperationException("Worker is not initialised and therefore cannot be started.");
+            }
+            if (this.IsActive)
             {
                 return fReturn;
             }
@@ -231,13 +270,14 @@ namespace biz.dfch.CS.LogShipper
             Trace.WriteLine("Starting worker thread ...");
             _thread.Start();
             Trace.WriteLine("Starting worker thread COMPLETED. _thread.IsAlive '{0}'", _thread.IsAlive, "");
+
             fReturn = true;
             this.IsActive = fReturn;
             return this.IsActive;
         }
-        public bool Start(String path)
+        public bool Start(String logFile, String scriptFile)
         {
-            var fReturn = this.Initialise(path);
+            var fReturn = this.Initialise(logFile, scriptFile);
             if(fReturn)
             {
                 fReturn = this.Start();
@@ -252,26 +292,24 @@ namespace biz.dfch.CS.LogShipper
             bool fCreated = false;
             try
             {
+                Trace.WriteLine("Do Work IsActive ...");
                 do
                 {
-                    Trace.WriteLine("Do Work IsActive ...");
-
-                    if (!File.Exists(_file))
+                    if (!File.Exists(_logFile))
                     {
                         fCreated = true;
-                        Trace.WriteLine("File '{0}' does not exist. Waiting ...", _file, "");
+                        Trace.WriteLine("File '{0}' does not exist. Waiting ...", _logFile, "");
                         System.Threading.Thread.Sleep(500);
                         continue;
                     }
 
                     using (StreamReader streamReader = new StreamReader(
-                           new FileStream(_file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                           new FileStream(_logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                        ))
                     {
                         long streamLength = 0;
                         if (!fCreated)
                         {
-                            //Trace.WriteLine(String.Format("Setting streamLength [{0}] to BaseStream.Length [{1}]. fCreated {2}", streamLength, streamReader.BaseStream.Length, fCreated));
                             streamLength = streamReader.BaseStream.Length;
                         }
                         do
@@ -290,14 +328,20 @@ namespace biz.dfch.CS.LogShipper
                             while (null != (line = streamReader.ReadLine()))
                             {
                                 //Trace.WriteLine("*** {0} ***", line, "");
-                                var results = PowerShell
-                                    .Create()
+                                //var ps = PowerShell
+                                //.Create()
                                     //.AddCommand("Log-Debug")
                                     //.AddParameter("fn", "fn")
                                     //.AddParameter("msg", line)
                                     //.AddScript(String.Format("[System.Diagnostics.Trace]::WriteLine('{0}')", line))
+                                _ps.Commands.Clear();
+                                _ps
                                     .AddScript(String.Format("[System.Diagnostics.Trace]::WriteLine('{0}')", line))
-                                    .AddScript(String.Format("return @('and the result is: {0}')", line))
+                                    //.AddScript(String.Format("return @('and the result is: {0}')", line))
+                                    .AddCommand(_scriptFile)
+                                    .AddParameter("InputObject", line)
+                                ;
+                                var results = _ps
                                     .Invoke();
                                 foreach (var result in results)
                                 {
@@ -334,10 +378,6 @@ namespace biz.dfch.CS.LogShipper
             if (null != _fileSystemWatcher)
             {
                 _fileSystemWatcher.Dispose();
-            }
-            if (null != _stateTimer)
-            {
-                _stateTimer.Dispose();
             }
         }
     }

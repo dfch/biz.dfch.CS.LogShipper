@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -32,12 +33,12 @@ namespace biz.dfch.CS.LogShipper
             {
                 OnStart(args);
                 fAbort.WaitOne();
-                Debug.WriteLine(string.Format("CancelKeyPress detected. Stopping interactive mode."));
+                Debug.WriteLine(String.Format("CancelKeyPress detected. Stopping interactive mode."));
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace));
-                Debug.WriteLine(string.Format("Stopping interactive mode."));
+                Debug.WriteLine(String.Format("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace));
+                Debug.WriteLine(String.Format("Stopping interactive mode."));
             }
             finally
             {
@@ -49,29 +50,23 @@ namespace biz.dfch.CS.LogShipper
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             try
             {
-                var Uri = string.Empty;
-                Uri = ConfigurationManager.AppSettings["Uri"];
-                if (2 <= args.Length) Uri = args[0];
-                Trace.Assert(!string.IsNullOrWhiteSpace(Uri), "Uri: Parameter validation FAILED.");
-
-                var ManagementUri = string.Empty;
-                ManagementUri = ConfigurationManager.AppSettings["ManagementUri"];
-                if (2 <= args.Length) ManagementUri = args[1];
-                Trace.Assert(!string.IsNullOrWhiteSpace(ManagementUri), "ManagementUri: Parameter validation FAILED.");
-
                 var UpdateIntervalMinutes = Convert.ToInt32(ConfigurationManager.AppSettings["UpdateIntervalMinutes"]);
-
                 var ServerNotReachableRetries = Convert.ToInt32(ConfigurationManager.AppSettings["ServerNotReachableRetries"]);
 
-                //_worker = new ScheduledTaskWorker(Uri, ManagementUri, UpdateIntervalMinutes, ServerNotReachableRetries);
+                String logFile = ConfigurationManager.AppSettings["LogFile"];
+                if (2 <= args.Length) logFile = args[0];
+                Trace.Assert(!string.IsNullOrWhiteSpace(logFile), "LogFile: Parameter validation FAILED.");
+
+                String scriptFile = ConfigurationManager.AppSettings["ScriptFile"];
+                if (2 <= args.Length) scriptFile = args[1];
+                Trace.Assert(!string.IsNullOrWhiteSpace(scriptFile), "ScriptFile: Parameter validation FAILED.");
+                
                 _worker = new LogShipperWorker();
-                String path = "C:\\Logs\\biz.dfch.PS.System.Logging\\2015-03";
-                String filter = "*.log";
-                _worker.Start(path);
+                _worker.Start(logFile, scriptFile);
             }
             catch (Exception ex)
             {
-                var msg = string.Format("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace);
+                var msg = String.Format("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace);
                 Debug.WriteLine(msg);
                 Environment.FailFast(msg, ex);
             }
