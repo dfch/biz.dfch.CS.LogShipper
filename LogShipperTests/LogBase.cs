@@ -8,11 +8,11 @@ namespace biz.dfch.CS.LogShipper
 {
     public class LogBase
     {
-        public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static void WriteException(Exception ex)
         {
-            if (log.IsErrorEnabled) log.ErrorFormat("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace);
+            if (Log.IsErrorEnabled) Log.ErrorFormat("{0}@{1}: {2}\r\n{3}", ex.GetType().Name, ex.Source, ex.Message, ex.StackTrace);
         }
     }
 }

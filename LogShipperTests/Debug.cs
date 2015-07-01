@@ -2,59 +2,59 @@
 using System;
 namespace biz.dfch.CS.LogShipper
 {
-    public class Trace : LogBase
+    public class Debug : LogBase
     {
         public static void WriteLine(string message, params object[] args)
         {
-            if (log.IsInfoEnabled) log.InfoFormat(message, args);
+            if (Log.IsDebugEnabled) Log.DebugFormat(message, args);
         }
         public static void WriteLine(string message, string category)
         {
-            if (log.IsInfoEnabled) log.InfoFormat("{0}|{1}", category, message);
+            if (Log.IsDebugEnabled) Log.DebugFormat("{0}|{1}", category, message);
         }
         public static void WriteLine(string message)
         {
-            if (log.IsInfoEnabled) log.Info(message);
+            if (Log.IsDebugEnabled) Log.Debug(message);
         }
         public static void WriteLine(object value, string category)
         {
-            if (log.IsInfoEnabled) log.InfoFormat("{0}|{1}", category, value.ToString());
+            if (Log.IsDebugEnabled) Log.DebugFormat("{0}|{1}", category, value.ToString());
         }
         public static void WriteLine(object value)
         {
-            if (log.IsInfoEnabled) log.Info(value.ToString());
+            if (Log.IsDebugEnabled) Log.Debug(value.ToString());
         }
         public static void WriteLine(Exception ex)
         {
-            if (log.IsInfoEnabled) WriteException(ex);
+            if (Log.IsDebugEnabled) WriteException(ex);
         }
         public static void Write(string message, string category)
         {
-            if (log.IsInfoEnabled) log.InfoFormat("{0}|{1}", category, message);
+            if (Log.IsDebugEnabled) Log.DebugFormat("{0}|{1}", category, message);
         }
         public static void Write(string message)
         {
-            if (log.IsInfoEnabled) log.Info(message);
+            if (Log.IsDebugEnabled) Log.Debug(message);
         }
         public static void Write(object value, string category)
         {
-            if (log.IsInfoEnabled) log.InfoFormat("{0}|{1}", category, value.ToString());
+            if (Log.IsDebugEnabled) Log.DebugFormat("{0}|{1}", category, value.ToString());
         }
         public static void Write(object value)
         {
-            if (log.IsInfoEnabled) log.Info(value.ToString());
+            if (Log.IsDebugEnabled) Log.Debug(value.ToString());
         }
         public static void Assert(bool condition, string message, string detailMessage)
         {
-            System.Diagnostics.Trace.Assert(condition, message, detailMessage);
+            System.Diagnostics.Debug.Assert(condition, message, detailMessage);
         }
         public static void Assert(bool condition, string message)
         {
-            System.Diagnostics.Trace.Assert(condition, message);
+            System.Diagnostics.Debug.Assert(condition, message);
         }
         public static void Assert(bool condition)
         {
-            System.Diagnostics.Trace.Assert(condition);
+            System.Diagnostics.Debug.Assert(condition);
         }
     }
 }

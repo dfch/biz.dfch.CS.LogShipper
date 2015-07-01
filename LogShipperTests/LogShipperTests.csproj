@@ -68,9 +68,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="LogBase.cs" />
-    <Compile Include="LogDebug.cs" />
-    <Compile Include="LogTrace.cs" />
-    <Compile Include="LogShipper.cs" />
+    <Compile Include="Debug.cs" />
+    <Compile Include="Trace.cs" />
+    <Compile Include="LogShipperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

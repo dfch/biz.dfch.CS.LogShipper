@@ -8,11 +8,11 @@ using System.Management.Automation;
 using biz.dfch.CS.LogShipper;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "LogShipperTests.dll.config", Watch = true)]
-namespace biz.dfch.CS.LogShipperTests
+namespace biz.dfch.CS.LogShipper.Tests
 {
     [TestClass]
     [DeploymentItem("LogShipperTests.dll.config")]
-    public class LogShipper
+    public class LogShipperTests
     {
         private static TestContext _testContext;
         public TestContext testContext
