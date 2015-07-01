@@ -70,7 +70,7 @@
     <Compile Include="LogBase.cs" />
     <Compile Include="LogDebug.cs" />
     <Compile Include="LogTrace.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="LogShipper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

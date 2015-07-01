@@ -12,7 +12,7 @@ namespace biz.dfch.CS.LogShipperTests
 {
     [TestClass]
     [DeploymentItem("LogShipperTests.dll.config")]
-    public class UnitTest1
+    public class LogShipper
     {
         private static TestContext _testContext;
         public TestContext testContext
