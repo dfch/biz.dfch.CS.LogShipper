@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogShipper", "LogShipper\LogShipper.csproj", "{F5670F7B-3B88-4AC3-8A25-469C94B8339D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogShipperTests", "LogShipperTests\LogShipperTests.csproj", "{F2B99E39-55A1-4A1A-9C85-CF3DE002F68A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogShipper.Tests", "LogShipper.Tests\LogShipper.Tests.csproj", "{F2B99E39-55A1-4A1A-9C85-CF3DE002F68A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogShipper.Extensions", "LogShipper.Extensions\LogShipper.Extensions.csproj", "{F556E6EB-5C98-4303-9C7F-FE76B78490FE}"
 EndProject

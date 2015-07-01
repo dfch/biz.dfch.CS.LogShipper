@@ -7,7 +7,7 @@ using biz.dfch.CS.LogShipper.Extensions;
 namespace biz.dfch.CS.LogShipper.Tests
 {
     [TestClass]
-    [DeploymentItem("LogShipperTests.dll.config")]
+    [DeploymentItem("LogShipper.Tests.dll.config")]
     public class LogShipperExtensionDefaultTextParserTests
     {
         [TestMethod]

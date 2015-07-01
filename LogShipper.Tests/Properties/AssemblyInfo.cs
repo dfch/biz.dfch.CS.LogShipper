@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LogShipperTests")]
+[assembly: AssemblyTitle("LogShipper.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("d-fens GmbH")]
-[assembly: AssemblyProduct("LogShipperTests")]
+[assembly: AssemblyProduct("LogShipper.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2015 Ronald Rink, d-fens GmbH")]
 [assembly: AssemblyTrademark("The d-fens logo is a registered trademark in the European Union and or other countries.")]
 [assembly: AssemblyCulture("")]
