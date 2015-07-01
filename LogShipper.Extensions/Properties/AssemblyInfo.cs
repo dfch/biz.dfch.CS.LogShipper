@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LogShipperTests")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("LogShipper.Extensions")]
+[assembly: AssemblyDescription("Extensions for parsing and output")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("d-fens GmbH")]
-[assembly: AssemblyProduct("LogShipperTests")]
+[assembly: AssemblyProduct("LogShipper.Extensions")]
 [assembly: AssemblyCopyright("Copyright ©  2015 Ronald Rink, d-fens GmbH")]
 [assembly: AssemblyTrademark("The d-fens logo is a registered trademark in the European Union and or other countries.")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("49a30612-65a8-4e99-9f30-27385b3e9724")]
+[assembly: Guid("dec5165c-09fc-40d6-8bcd-60fc92e20207")]
 
 // Version information for an assembly consists of the following four values:
 //

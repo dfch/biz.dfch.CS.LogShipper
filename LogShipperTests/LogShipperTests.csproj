@@ -6,7 +6,7 @@
     <ProjectGuid>{F2B99E39-55A1-4A1A-9C85-CF3DE002F68A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LogShipperTests</RootNamespace>
+    <RootNamespace>biz.dfch.CS.LogShipper.Tests</RootNamespace>
     <AssemblyName>LogShipperTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -72,8 +72,17 @@
     <Compile Include="Trace.cs" />
     <Compile Include="LogShipperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LogShipperExtensionDefaultTextParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LogShipper.Contracts\LogShipper.Contracts.csproj">
+      <Project>{68b1bb50-c393-4a83-aed5-9b1c13f52f48}</Project>
+      <Name>LogShipper.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogShipper.Extensions\LogShipper.Extensions.csproj">
+      <Project>{f556e6eb-5c98-4303-9c7f-fe76b78490fe}</Project>
+      <Name>LogShipper.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogShipper\LogShipper.csproj">
       <Project>{f5670f7b-3b88-4ac3-8a25-469c94b8339d}</Project>
       <Name>LogShipper</Name>
