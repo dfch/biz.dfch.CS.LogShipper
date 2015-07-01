@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILogShipperParserData.cs" />
+    <Compile Include="ILogShipperOutputData.cs" />
     <Compile Include="ILogShipperParser.cs" />
     <Compile Include="ILogShipperOutput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

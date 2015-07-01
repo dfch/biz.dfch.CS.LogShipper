@@ -1,11 +1,6 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using System.Configuration;
-using System.Management;
-using System.Management.Automation;
-
-using biz.dfch.CS.LogShipper;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "LogShipper.Tests.dll.config", Watch = true)]
 namespace biz.dfch.CS.LogShipper.Tests

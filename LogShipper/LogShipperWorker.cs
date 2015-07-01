@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Management.Automation;
+using System.Threading;
+using biz.dfch.CS.LogShipper.Contracts;
+
 // Install-Package Microsoft.Net.Http
 // https://www.nuget.org/packages/Microsoft.Net.Http
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
-using System.Management;
-using System.Management.Automation;
 // Install-Package Newtonsoft.Json
 // https://www.nuget.org/packages/Newtonsoft.Json/6.0.1
 // http://james.newtonking.com/json/help/index.html?topic=html/SelectToken.htm#
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.IO;
-using System.Runtime.CompilerServices;
-
 namespace biz.dfch.CS.LogShipper
 {
     public class LogShipperWorker
@@ -31,6 +27,113 @@ namespace biz.dfch.CS.LogShipper
         private String _scriptFile;
         private Thread _thread;
         readonly PowerShell _ps = PowerShell.Create();
+
+        private readonly CompositionContainer _container;
+        [ImportMany]
+        private IEnumerable<Lazy<ILogShipperParser, ILogShipperParserData>> _parsers;
+        private Lazy<ILogShipperParser, ILogShipperParserData> _parser;
+        [ImportMany]
+        private IEnumerable<Lazy<ILogShipperOutput, ILogShipperOutputData>> _outputs;
+        private List<Lazy<ILogShipperOutput, ILogShipperOutputData>> _outputsActive = new List<Lazy<ILogShipperOutput, ILogShipperOutputData>>();
+
+        private void InitialiseExtensions(CompositionContainer container)
+        {
+            // An aggregate catalog that combines multiple catalogs
+            var catalog = new AggregateCatalog();
+
+            // Adds all the parts found in the given directory
+            var folder = ConfigurationManager.AppSettings["ExtensionsFolder"];
+            try
+            {
+                if (!Path.IsPathRooted(folder))
+                {
+                    folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, folder);
+                }
+                catalog.Catalogs.Add(new DirectoryCatalog(folder));
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(String.Format("AppSettings.ExtensionsFolder: Loading extensions from '{0}' FAILED.\n{1}", folder, ex.Message));
+            }
+            finally
+            {
+                // Adds all the parts found in the same assembly as the Program class
+                catalog.Catalogs.Add(new AssemblyCatalog(typeof(Program).Assembly));
+            }
+
+            // Create the CompositionContainer with the parts in the catalog
+            container = new CompositionContainer(catalog);
+            try
+            {
+                // Fill the imports of this object
+                container.ComposeParts(this);
+            }
+            catch (CompositionException compositionException)
+            {
+                Trace.WriteLine(compositionException.ToString());
+                throw;
+            }
+
+            // Get parser
+            LoadParserExtension(ConfigurationManager.AppSettings["ParserName"]);
+
+            // Get output
+            LoadOutputExtension(ConfigurationManager.AppSettings["OutputName"]);
+        }
+ 
+        private void LoadParserExtension(String name)
+        {
+            if(String.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException("LoadParserExtension.name: Parameter validation FAILED. Parameter must not be null or empty.");
+            }
+            var parserName = name;
+            try
+            {
+                var parserNameNormalised = parserName.Trim();
+                _parser = _parsers
+                                  .Where(
+                                       p => p.Metadata.Name.Equals(
+                                           parserNameNormalised,
+                                           StringComparison.InvariantCultureIgnoreCase))
+                                  .Single();
+                Trace.WriteLine(String.Format("{0}: Loading parser extension SUCCEEDED.", parserNameNormalised));
+            }
+            catch (InvalidOperationException ex)
+            {
+                Trace.WriteLine(String.Format("AppSettings.ParserName: Parameter validation FAILED. Parameter must not be null or empty and '{0}' has to be a valid parser extension.\n{1}", parserName, ex.Message));
+                throw;
+            }
+        }
+ 
+        private void LoadOutputExtension(String name)
+        {
+            if(String.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException("LoadOutputExtension.name: Parameter validation FAILED. Parameter must not be null or empty.");
+            }
+            var outputNames = name.Split(new char[] { ',', ';' });
+            foreach (var outputName in outputNames)
+            {
+                try
+                {
+                    var outputNameNormalised = outputName.Trim();
+                    var output = _outputs
+                                         .Where(
+                                              p => p.Metadata.Name.Equals(
+                                                  outputNameNormalised,
+                                                  StringComparison.InvariantCultureIgnoreCase))
+                                         .Single();
+                    _outputsActive.Add(output);
+                    Trace.WriteLine(String.Format("{0}: Loading output extension SUCCEEDED.", outputNameNormalised));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Trace.WriteLine(String.Format("AppSettings.OutputName: Parameter validation FAILED. Parameter must not be null or empty and '{0}' has to be a valid output extension.\n{1}", outputName, ex.Message));
+                    throw;
+                }
+            }
+        }
 
         public bool IsActive
         {
@@ -51,10 +154,16 @@ namespace biz.dfch.CS.LogShipper
         public LogShipperWorker()
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            InitialiseExtensions(_container);
         }
+ 
         public LogShipperWorker(String logFile, String scriptFile)
         {
             Debug.WriteLine("{0}:{1}.{2}", this.GetType().Namespace, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            InitialiseExtensions(_container);
+
             var fReturn = false;
             fReturn = this.Initialise(logFile, scriptFile);
         }
@@ -93,7 +202,6 @@ namespace biz.dfch.CS.LogShipper
                 }
                 _logFile = logFile;
                 _logFilter = String.Format("*{0}", Path.GetExtension(logFile));
-
 
                 if (_isInitialised)
                 {
@@ -352,6 +460,7 @@ namespace biz.dfch.CS.LogShipper
                                     //}
                                     //System.Diagnostics.Trace.WriteLine(result.Members.ToString());
                                 }
+
                             }
 
                             // update to last read offset

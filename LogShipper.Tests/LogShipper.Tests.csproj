@@ -67,6 +67,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Extensions\LogShipperExtensionConsoleOutputTests.cs" />
     <Compile Include="LogBase.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Trace.cs" />

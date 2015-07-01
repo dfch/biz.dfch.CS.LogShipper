@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using biz.dfch.CS.LogShipper.Contracts;
-using System.ComponentModel.Composition;
-using System.Collections;
 
 namespace biz.dfch.CS.LogShipper.Extensions
 {
     [Export(typeof(ILogShipperParser))]
+    [ExportMetadata("Name", "DefaultTextParser")]
     public class DefaultTextParser : ILogShipperParser
     {
         private Object context;
-        public object Context
+        public Object Context
         {
             get
             {
@@ -26,7 +25,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
         }
 
         private String data;
-        public string Data
+        public String Data
         {
             get
             {
