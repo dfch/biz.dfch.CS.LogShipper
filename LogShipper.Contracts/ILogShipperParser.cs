@@ -12,6 +12,7 @@ namespace biz.dfch.CS.LogShipper.Contracts
         Object Context { get; set; }
         String Data { get; set;}
         List<String> Parse(String data);
+        bool RefreshContext();
     }
 
 }

@@ -26,7 +26,6 @@ namespace biz.dfch.CS.LogShipper
         private String _logFilter;
         private String _scriptFile;
         private Thread _thread;
-        readonly PowerShell _ps = PowerShell.Create();
 
         private readonly CompositionContainer _container;
         [ImportMany]
@@ -97,6 +96,9 @@ namespace biz.dfch.CS.LogShipper
                                            parserNameNormalised,
                                            StringComparison.InvariantCultureIgnoreCase))
                                   .Single();
+                _parser.Value.Data = "some-meaningless-data";
+                _parser.Value.Context = new Object();
+
                 Trace.WriteLine(String.Format("{0}: Loading parser extension SUCCEEDED.", parserNameNormalised));
             }
             catch (InvalidOperationException ex)
@@ -124,6 +126,7 @@ namespace biz.dfch.CS.LogShipper
                                                   outputNameNormalised,
                                                   StringComparison.InvariantCultureIgnoreCase))
                                          .Single();
+                    output.Value.Context = new Object();
                     _outputsActive.Add(output);
                     Trace.WriteLine(String.Format("{0}: Loading output extension SUCCEEDED.", outputNameNormalised));
                 }
@@ -435,40 +438,21 @@ namespace biz.dfch.CS.LogShipper
                             var line = String.Empty;
                             while (null != (line = streamReader.ReadLine()))
                             {
-                                //Trace.WriteLine("*** {0} ***", line, "");
-                                //var ps = PowerShell
-                                //.Create()
-                                    //.AddCommand("Log-Debug")
-                                    //.AddParameter("fn", "fn")
-                                    //.AddParameter("msg", line)
-                                    //.AddScript(String.Format("[System.Diagnostics.Trace]::WriteLine('{0}')", line))
-                                _ps.Commands.Clear();
-                                _ps
-                                    .AddScript(String.Format("[System.Diagnostics.Trace]::WriteLine('{0}')", line))
-                                    //.AddScript(String.Format("return @('and the result is: {0}')", line))
-                                    .AddCommand(_scriptFile)
-                                    .AddParameter("InputObject", line)
-                                ;
-                                var results = _ps
-                                    .Invoke();
-                                foreach (var result in results)
+                                var list = _parser.Value.Parse(line);
+                                foreach(var output in _outputsActive)
                                 {
-                                    System.Diagnostics.Trace.WriteLine(String.Format("result: '{0}'", result.BaseObject.ToString()));
-                                    //foreach (var member in result.Members)
-                                    //{
-                                    //    System.Diagnostics.Trace.WriteLine(String.Format("{0}:{1}", member.Name, member.Value));
-                                    //}
-                                    //System.Diagnostics.Trace.WriteLine(result.Members.ToString());
+                                    list.ForEach(l => output.Value.Log(l));
                                 }
-
                             }
 
                             // update to last read offset
                             streamLength = streamReader.BaseStream.Position;
                             System.Threading.Thread.Sleep(100);
-                        } while (this.IsActive);
+                        }
+                        while (this.IsActive);
                     }
-                } while (this.IsActive);
+                }
+                while (this.IsActive);
             }
             catch(ThreadAbortException ex)
             {

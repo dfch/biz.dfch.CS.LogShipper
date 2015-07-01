@@ -71,5 +71,10 @@ namespace biz.dfch.CS.LogShipper.Extensions
             list.RemoveAt(list.Count-1);
             return list;
         }
+        public bool RefreshContext()
+        {
+            // TODO: Implement this method
+            throw new NotImplementedException();
+        }
     }
 }
