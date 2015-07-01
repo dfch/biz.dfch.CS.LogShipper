@@ -138,7 +138,7 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Assert
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.Count);
-            var line = (data.Split(System.Environment.NewLine.ToCharArray()))[0];
+            var line = "hello, world!";
             Assert.AreEqual(line, list[0]);
         }
         [TestMethod]
@@ -156,8 +156,26 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Assert
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.Count);
-            var line = (data.Split(System.Environment.NewLine.ToCharArray()))[0];
+            var line = "hello, world!";
             Assert.AreEqual(line, list[0]);
+        }
+        [TestMethod]
+        public void ParseEmptyLineDataShouldReturnOneListItem()
+        {
+            // Arrange
+            var data = "hello, world!\r\n\nsome more text without line break ...";
+            var parser = new DefaultTextParser();
+            parser.Context = new Object();
+            parser.Data = "some-meaningless-data";
+
+            // Act
+            var list = parser.Parse(data);
+
+            // Assert
+            Assert.IsNotNull(list);
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual("hello, world!", list[0]);
+            Assert.AreEqual("", list[1]);
         }
         [TestMethod]
         public void ParseManyLinesDataShouldReturnHugeList()
