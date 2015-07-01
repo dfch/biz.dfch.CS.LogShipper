@@ -106,9 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LogBase.cs" />
-    <Compile Include="LogDebug.cs" />
+    <Compile Include="Debug.cs" />
     <Compile Include="LogShipperWorker.cs" />
-    <Compile Include="LogTrace.cs" />
+    <Compile Include="Trace.cs" />
     <Compile Include="LogShipperService.cs">
       <SubType>Component</SubType>
     </Compile>

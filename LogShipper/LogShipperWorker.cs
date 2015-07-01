@@ -24,13 +24,13 @@ namespace biz.dfch.CS.LogShipper
     {
         private bool _isInitialised = false;
         private volatile bool _isActive = false;
-        private FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
+        private readonly FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
         private String _logFile;
         private String _logPath;
         private String _logFilter;
         private String _scriptFile;
         private Thread _thread;
-        PowerShell _ps = PowerShell.Create();
+        readonly PowerShell _ps = PowerShell.Create();
 
         public bool IsActive
         {

@@ -35,12 +35,12 @@ namespace biz.dfch.CS.LogShipper
             }
             else
             {
-                ServiceBase[] ServicesToRun;
-                ServicesToRun = new ServiceBase[] 
+                ServiceBase[] servicesToRun;
+                servicesToRun = new ServiceBase[] 
                 { 
                     new LogShipperService() 
                 };
-                ServiceBase.Run(ServicesToRun);
+                ServiceBase.Run(servicesToRun);
             }
         }
     }
