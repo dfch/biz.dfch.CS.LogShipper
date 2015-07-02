@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace biz.dfch.CS.LogShipper.Contracts
 {
     public interface ILogShipperParser
     {
-        Object Context { get; set; }
-        String Data { get; set;}
+        NameValueCollection Configuration { get; set; }
+        UInt32 OffsetParsed { get; }
         List<String> Parse(String data);
         bool RefreshContext();
     }

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using biz.dfch.CS.LogShipper.Contracts;
+using System.Collections.Specialized;
 
 namespace biz.dfch.CS.LogShipper.Extensions
 {
@@ -11,42 +12,37 @@ namespace biz.dfch.CS.LogShipper.Extensions
     [ExportMetadata("Name", "DefaultTextParser")]
     public class DefaultTextParser : ILogShipperParser
     {
-        private Object context;
-        public Object Context
+        private NameValueCollection configuration;
+        public NameValueCollection Configuration
         {
             get
             {
-                return context;
+                return configuration;
             }
             set
             {
-                context = value;
+                configuration = value;
             }
         }
 
-        private String data;
-        public String Data
+        // DFTODO Implement OffsetParsed
+        private UInt32 offsetParsed;
+        public UInt32 OffsetParsed
         {
             get
             {
-                return data;
-            }
-            set
-            {
-                data = value;
+                return offsetParsed;
             }
         }
 
         public List<String> Parse(String data)
         {
-            if(null == this.context)
+            if(null == this.configuration)
             {
-                throw new ArgumentNullException("Context", "Context: Parameter validation FAILED. Parameter must not be null or empty.");
+                throw new ArgumentNullException("Configuration", "Configuration: Parameter validation FAILED. Parameter must not be null or empty.");
             }
-            if (String.IsNullOrWhiteSpace(this.data))
-            {
-                throw new ArgumentNullException("Data", "Data: Parameter validation FAILED. Parameter must not be null or empty.");
-            }
+
+            offsetParsed = 0;
             var list = new List<String>();
 
             if (String.IsNullOrEmpty(data))
@@ -71,9 +67,10 @@ namespace biz.dfch.CS.LogShipper.Extensions
             list.RemoveAt(list.Count-1);
             return list;
         }
+
         public bool RefreshContext()
         {
-            // TODO: Implement this method
+            // DFTODO: Implement this method
             throw new NotImplementedException();
         }
     }

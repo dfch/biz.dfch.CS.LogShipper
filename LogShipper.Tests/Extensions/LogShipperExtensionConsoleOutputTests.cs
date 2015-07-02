@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using biz.dfch.CS.LogShipper;
 using biz.dfch.CS.LogShipper.Contracts;
 using biz.dfch.CS.LogShipper.Extensions;
+using System.Collections.Specialized;
 
 namespace biz.dfch.CS.LogShipper.Tests
 {
@@ -17,7 +18,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             String data = null;
             var output = new DefaultConsoleOutput();
-            output.Context = new Object();
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            output.Configuration = nvc;
 
             // Act
             var fReturn = output.Log(data);
@@ -32,7 +35,7 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!";
             var output = new DefaultConsoleOutput();
-            output.Context = null;
+            output.Configuration = null;
 
             // Act
             var fReturn = output.Log(data);
@@ -46,7 +49,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "Hello, world!";
             var output = new DefaultConsoleOutput();
-            output.Context = new Object();
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            output.Configuration = nvc;
 
             // Act
             var fReturn = output.Log(data);

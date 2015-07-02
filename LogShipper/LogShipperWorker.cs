@@ -8,6 +8,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Threading;
 using biz.dfch.CS.LogShipper.Contracts;
+using System.Collections.Specialized;
 
 // Install-Package Microsoft.Net.Http
 // https://www.nuget.org/packages/Microsoft.Net.Http
@@ -86,24 +87,28 @@ namespace biz.dfch.CS.LogShipper
             {
                 throw new ArgumentNullException("LoadParserExtension.name: Parameter validation FAILED. Parameter must not be null or empty.");
             }
-            var parserName = name;
             try
             {
-                var parserNameNormalised = parserName.Trim();
+                var parserNameNormalised = name.Trim();
                 _parser = _parsers
                                   .Where(
                                        p => p.Metadata.Name.Equals(
                                            parserNameNormalised,
                                            StringComparison.InvariantCultureIgnoreCase))
                                   .Single();
-                _parser.Value.Data = "some-meaningless-data";
-                _parser.Value.Context = new Object();
+                var section = ConfigurationManager.GetSection(_parser.Metadata.Name) as NameValueCollection;
+                _parser.Value.Configuration = section;
 
                 Trace.WriteLine(String.Format("{0}: Loading parser extension SUCCEEDED.", parserNameNormalised));
             }
             catch (InvalidOperationException ex)
             {
-                Trace.WriteLine(String.Format("AppSettings.ParserName: Parameter validation FAILED. Parameter must not be null or empty and '{0}' has to be a valid parser extension.\n{1}", parserName, ex.Message));
+                Trace.WriteLine(String.Format("AppSettings.ParserName: Parameter validation FAILED. Parameter must not be null or empty and '{0}' has to be a valid parser extension.\n{1}", name, ex.Message));
+                throw;
+            }
+            catch(ConfigurationErrorsException ex)
+            {
+                Trace.WriteLine(String.Format("AppSettings.configSections: Section name '{0}' does not exist.\n{1}", name, ex.Message));
                 throw;
             }
         }
@@ -126,13 +131,19 @@ namespace biz.dfch.CS.LogShipper
                                                   outputNameNormalised,
                                                   StringComparison.InvariantCultureIgnoreCase))
                                          .Single();
-                    output.Value.Context = new Object();
+                    var section = ConfigurationManager.GetSection(outputNameNormalised) as NameValueCollection;
+                    output.Value.Configuration = section;
                     _outputsActive.Add(output);
                     Trace.WriteLine(String.Format("{0}: Loading output extension SUCCEEDED.", outputNameNormalised));
                 }
                 catch (InvalidOperationException ex)
                 {
                     Trace.WriteLine(String.Format("AppSettings.OutputName: Parameter validation FAILED. Parameter must not be null or empty and '{0}' has to be a valid output extension.\n{1}", outputName, ex.Message));
+                    throw;
+                }
+                catch (ConfigurationErrorsException ex)
+                {
+                    Trace.WriteLine(String.Format("AppSettings.configSections: Section name '{0}' does not exist.\n{1}", outputName, ex.Message));
                     throw;
                 }
             }

@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using biz.dfch.CS.LogShipper;
 using biz.dfch.CS.LogShipper.Contracts;
 using biz.dfch.CS.LogShipper.Extensions;
+using System.Collections.Specialized;
 
 namespace biz.dfch.CS.LogShipper.Tests
 {
@@ -12,29 +13,12 @@ namespace biz.dfch.CS.LogShipper.Tests
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ParseUninitialisedDataShouldThrowArgumentNullException()
-        {
-            // Arrange
-            var data = "hello, world!\n";
-            var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = String.Empty;
-
-            // Act
-            var list = parser.Parse(data);
-
-            // Assert
-            Assert.IsNull(list);
-        }
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ParseUninitialisedContextShouldThrowArgumentNullException()
         {
             // Arrange
             var data = "hello, world!\n";
             var parser = new DefaultTextParser();
-            parser.Context = null;
-            parser.Data = "some-meaningless-data";
+            parser.Configuration = null;
 
             // Act
             var list = parser.Parse(data);
@@ -49,8 +33,7 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\n";
             var parser = new DefaultTextParser();
-            parser.Context = null;
-            parser.Data = "    ";
+            parser.Configuration = null;
 
             // Act
             var list = parser.Parse(data);
@@ -64,8 +47,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = String.Empty;
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc;
 
             // Act
             var list = parser.Parse(data);
@@ -80,8 +64,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!";
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc;
 
             // Act
             var list = parser.Parse(data);
@@ -96,8 +81,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\n";
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc;
 
             // Act
             var list = parser.Parse(data);
@@ -112,8 +98,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc; 
 
             // Act
             var list = parser.Parse(data);
@@ -129,8 +116,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             var data = "hello, world!\rsome more text without line break ...";
 
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc; 
 
             // Act
             var list = parser.Parse(data);
@@ -147,8 +135,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc;
 
             // Act
             var list = parser.Parse(data);
@@ -165,8 +154,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\n\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc; 
 
             // Act
             var list = parser.Parse(data);
@@ -190,8 +180,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             var data = sb.ToString();
 
             var parser = new DefaultTextParser();
-            parser.Context = new Object();
-            parser.Data = "some-meaningless-data";
+            var nvc = new NameValueCollection();
+            nvc.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nvc; 
 
             // Act
             var list = parser.Parse(data);

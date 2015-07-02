@@ -6,6 +6,7 @@ using System.Text;
 using biz.dfch.CS.LogShipper.Contracts;
 using System.Management.Automation;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace biz.dfch.CS.LogShipper.Extensions
 {
@@ -17,42 +18,46 @@ namespace biz.dfch.CS.LogShipper.Extensions
 
         private String _scriptFile;
 
-        private Object context;
-        public Object Context
+        private NameValueCollection configuration;
+        public NameValueCollection Configuration
         {
             get
             {
-                return context;
+                return configuration;
             }
             set
             {
-                context = value;
+                configuration = value;
+                _scriptFile = configuration.Get("ScriptFile");
+                if(String.IsNullOrWhiteSpace(_scriptFile))
+                {
+                    throw new ArgumentNullException("ScriptFile", "PowerShellParser.Configuration: Parameter validation FAILED. ScriptFile must not be null or empty.");
+                }
+                
             }
         }
 
-        private String data;
-        public String Data
+        // DFTODO Implement OffsetParsed
+        private UInt32 offsetParsed;
+        public UInt32 OffsetParsed
         {
             get
             {
-                return data;
+                return offsetParsed;
             }
             set
             {
-                data = value;
+                offsetParsed = value;
             }
         }
 
         public List<String> Parse(String data)
         {
-            if (null == this.context)
+            if (null == this.configuration)
             {
-                throw new ArgumentNullException("Context", "Context: Parameter validation FAILED. Parameter must not be null or empty.");
+                throw new ArgumentNullException("Configuration", "Configuration: Parameter validation FAILED. Parameter must not be null or empty.");
             }
-            if (String.IsNullOrWhiteSpace(this.data))
-            {
-                throw new ArgumentNullException("Data", "Data: Parameter validation FAILED. Parameter must not be null or empty.");
-            }
+            offsetParsed = 0;
             var list = new List<String>();
 
             if (String.IsNullOrEmpty(data))
@@ -96,7 +101,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
             if (!File.Exists(externalParameterScriptFile)) throw new FileNotFoundException(String.Format("externalParameterScriptFile: Parameter validation FAILED. File '{0}' does not exist.", externalParameterScriptFile), externalParameterScriptFile);
             _scriptFile = externalParameterScriptFile;
 
-            // TODO: Implement this method
+            // DFTODO: Implement this method
             throw new NotImplementedException();
         }
     }
