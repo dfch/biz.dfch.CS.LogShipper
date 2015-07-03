@@ -17,7 +17,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         {
             // Arrange
             String data = null;
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             var nvc = new NameValueCollection();
             nvc.Add("arbitrary-name", "arbitrary-value");
             output.Configuration = nvc;
@@ -34,7 +34,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         {
             // Arrange
             var data = "hello, world!";
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             output.Configuration = null;
 
             // Act
@@ -48,7 +48,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         {
             // Arrange
             var data = "Hello, world!";
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             var nvc = new NameValueCollection();
             nvc.Add("arbitrary-name", "arbitrary-value");
             output.Configuration = nvc;
@@ -63,7 +63,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         public void UpdateConfigurationShouldReturnTrue()
         {
             // Arrange
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
 
@@ -78,7 +78,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         public void UpdateConfigurationShouldReturnFalse()
         {
             // Arrange
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
             output.Configuration = nameValueCollection;
@@ -94,7 +94,7 @@ namespace biz.dfch.CS.LogShipper.Tests
         public void UpdateLocalConfigurationKeepsExtensionConfigurationUnchanged()
         {
             // Arrange
-            var output = new DefaultConsoleOutput();
+            var output = new ConsoleOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
 

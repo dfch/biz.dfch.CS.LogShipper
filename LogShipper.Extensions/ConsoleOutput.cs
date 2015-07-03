@@ -7,8 +7,8 @@ using biz.dfch.CS.LogShipper.Contracts;
 namespace biz.dfch.CS.LogShipper.Extensions
 {
     [Export(typeof(ILogShipperOutput))]
-    [ExportMetadata("Name", "DefaultConsoleOutput")]
-    public class DefaultConsoleOutput : ILogShipperOutput
+    [ExportMetadata("Name", "ConsoleOutput")]
+    public class ConsoleOutput : ILogShipperOutput
     {
         private NameValueCollection _configuration;
         public NameValueCollection Configuration
@@ -21,7 +21,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
             {
                 if (null == value)
                 {
-                    throw new ArgumentNullException("Configuration", "DefaultConsoleOutput.Configuration: Parameter validation FAILED. Parameter must not be null.");
+                    throw new ArgumentNullException("Configuration", "ConsoleOutput.Configuration: Parameter validation FAILED. Parameter must not be null.");
                 }
                 _configuration = value;
             }
