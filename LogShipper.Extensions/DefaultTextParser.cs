@@ -84,7 +84,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
                 {
                     throw new ArgumentNullException("configuration", "configuration: Parameter validation FAILED. Parameter must not be null.");
                 }
-                _configuration = configuration;
+                _configuration = new NameValueCollection(configuration);
                 fReturn = true;
             }
             catch

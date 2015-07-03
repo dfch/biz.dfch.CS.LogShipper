@@ -98,7 +98,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
                 {
                     throw new ArgumentNullException("ScriptFile", "PowerShellParser.Configuration: Parameter validation FAILED. ScriptFile must not be null.");
                 }
-                _configuration = configuration;
+                _configuration = new NameValueCollection(configuration);
 
                 var externalParameterScriptFile = "";
                 if (null == externalParameterScriptFile || String.IsNullOrWhiteSpace(externalParameterScriptFile)) throw new ArgumentNullException("externalParameterScriptFile", String.Format("externalParameterScriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
