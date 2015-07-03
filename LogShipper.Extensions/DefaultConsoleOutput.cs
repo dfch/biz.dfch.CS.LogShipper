@@ -10,22 +10,26 @@ namespace biz.dfch.CS.LogShipper.Extensions
     [ExportMetadata("Name", "DefaultConsoleOutput")]
     public class DefaultConsoleOutput : ILogShipperOutput
     {
-        private NameValueCollection configuration;
+        private NameValueCollection _configuration;
         public NameValueCollection Configuration
         {
             get
             {
-                return configuration;
+                return _configuration;
             }
             set
             {
-                configuration = value;
+                if (null == value)
+                {
+                    throw new ArgumentNullException("Configuration", "DefaultConsoleOutput.Configuration: Parameter validation FAILED. Parameter must not be null.");
+                }
+                _configuration = value;
             }
         }
 
         public bool Log(string data)
         {
-            if (null == this.configuration)
+            if (null == _configuration)
             {
                 throw new ArgumentNullException("Configuration", "Configuration: Parameter validation FAILED. Parameter must not be null or empty.");
             }
@@ -35,6 +39,28 @@ namespace biz.dfch.CS.LogShipper.Extensions
             }
             Console.WriteLine(String.Format("{0:yyyy-MM-dd HH:mm:ss.fffzzz}: {1}", DateTime.Now, data));
             return true;
+        }
+        public bool UpdateConfiguration(NameValueCollection configuration)
+        {
+            return VerifyAndSetConfiguration(configuration);
+        }
+        private bool VerifyAndSetConfiguration(NameValueCollection configuration)
+        {
+            var fReturn = false;
+            try
+            {
+                if (null == configuration)
+                {
+                    throw new ArgumentNullException("configuration", "configuration: Parameter validation FAILED. Parameter must not be null.");
+                }
+                _configuration = configuration;
+                fReturn = true;
+            }
+            catch
+            {
+                fReturn = false;
+            }
+            return fReturn;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace biz.dfch.CS.LogShipper.Contracts
         NameValueCollection Configuration { get; set; }
         UInt32 OffsetParsed { get; }
         List<String> Parse(String data);
-        bool RefreshContext();
+        bool UpdateConfiguration(NameValueCollection configuration);
     }
 
 }

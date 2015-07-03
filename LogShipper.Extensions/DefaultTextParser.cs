@@ -12,37 +12,40 @@ namespace biz.dfch.CS.LogShipper.Extensions
     [ExportMetadata("Name", "DefaultTextParser")]
     public class DefaultTextParser : ILogShipperParser
     {
-        private NameValueCollection configuration;
+        private NameValueCollection _configuration;
         public NameValueCollection Configuration
         {
             get
             {
-                return configuration;
+                return _configuration;
             }
             set
             {
-                configuration = value;
+                if (VerifyAndSetConfiguration(value))
+                {
+                    throw new ArgumentNullException("Configuration", "DefaultTextParser.Configuration: Parameter validation FAILED. Parameter must not be null.");
+                }
             }
         }
 
         // DFTODO Implement OffsetParsed
-        private UInt32 offsetParsed;
+        private UInt32 _offsetParsed;
         public UInt32 OffsetParsed
         {
             get
             {
-                return offsetParsed;
+                return _offsetParsed;
             }
         }
 
         public List<String> Parse(String data)
         {
-            if(null == this.configuration)
+            if(null == _configuration)
             {
                 throw new ArgumentNullException("Configuration", "Configuration: Parameter validation FAILED. Parameter must not be null or empty.");
             }
 
-            offsetParsed = 0;
+            _offsetParsed = 0;
             var list = new List<String>();
 
             if (String.IsNullOrEmpty(data))
@@ -68,10 +71,27 @@ namespace biz.dfch.CS.LogShipper.Extensions
             return list;
         }
 
-        public bool RefreshContext()
+        public bool UpdateConfiguration(NameValueCollection configuration)
         {
-            // DFTODO: Implement this method
-            throw new NotImplementedException();
+            return VerifyAndSetConfiguration(configuration);
+        }
+        private bool VerifyAndSetConfiguration(NameValueCollection configuration)
+        {
+            var fReturn = false;
+            try
+            {
+                if (null == configuration)
+                {
+                    throw new ArgumentNullException("configuration", "configuration: Parameter validation FAILED. Parameter must not be null.");
+                }
+                _configuration = configuration;
+                fReturn = true;
+            }
+            catch
+            {
+                fReturn = false;
+            }
+            return fReturn;
         }
     }
 }

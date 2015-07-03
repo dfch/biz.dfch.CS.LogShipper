@@ -17,47 +17,43 @@ namespace biz.dfch.CS.LogShipper.Extensions
         readonly PowerShell _ps = PowerShell.Create();
 
         private String _scriptFile;
-
-        private NameValueCollection configuration;
+        private NameValueCollection _configuration;
         public NameValueCollection Configuration
         {
             get
             {
-                return configuration;
+                return _configuration;
             }
             set
             {
-                configuration = value;
-                _scriptFile = configuration.Get("ScriptFile");
-                if(String.IsNullOrWhiteSpace(_scriptFile))
+                if (VerifyAndSetConfiguration(value))
                 {
-                    throw new ArgumentNullException("ScriptFile", "PowerShellParser.Configuration: Parameter validation FAILED. ScriptFile must not be null or empty.");
+                    throw new ArgumentNullException("Configuration", "DefaultTextParser.Configuration: Parameter validation FAILED. Parameter must not be null.");
                 }
-                
             }
         }
 
         // DFTODO Implement OffsetParsed
-        private UInt32 offsetParsed;
+        private UInt32 _offsetParsed;
         public UInt32 OffsetParsed
         {
             get
             {
-                return offsetParsed;
+                return _offsetParsed;
             }
             set
             {
-                offsetParsed = value;
+                _offsetParsed = value;
             }
         }
 
         public List<String> Parse(String data)
         {
-            if (null == this.configuration)
+            if (null == _configuration)
             {
-                throw new ArgumentNullException("Configuration", "Configuration: Parameter validation FAILED. Parameter must not be null or empty.");
+                throw new ArgumentNullException("Configuration", "PowerShellParser.Configuration: Parameter validation FAILED. Parameter must not be null.");
             }
-            offsetParsed = 0;
+            _offsetParsed = 0;
             var list = new List<String>();
 
             if (String.IsNullOrEmpty(data))
@@ -84,25 +80,48 @@ namespace biz.dfch.CS.LogShipper.Extensions
             
             return list;
         }
-        public bool RefreshContext()
+        public bool UpdateConfiguration(NameValueCollection configuration)
         {
-            var externalParameterScriptFile = "";
-            if (null == externalParameterScriptFile || String.IsNullOrWhiteSpace(externalParameterScriptFile)) throw new ArgumentNullException("externalParameterScriptFile", String.Format("externalParameterScriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
-            if (String.IsNullOrWhiteSpace(Path.GetDirectoryName(externalParameterScriptFile)))
+            return VerifyAndSetConfiguration(configuration);
+        }
+        private bool VerifyAndSetConfiguration(NameValueCollection configuration)
+        {
+            var fReturn = false;
+            try
             {
-                externalParameterScriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(externalParameterScriptFile));
-            }
-            var achFileName = Path.GetFileName(externalParameterScriptFile).ToCharArray();
-            var achFileInvalidChars = Path.GetInvalidFileNameChars();
-            if ('\0' != achFileName.Intersect(achFileInvalidChars).FirstOrDefault())
-            {
-                throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", externalParameterScriptFile);
-            }
-            if (!File.Exists(externalParameterScriptFile)) throw new FileNotFoundException(String.Format("externalParameterScriptFile: Parameter validation FAILED. File '{0}' does not exist.", externalParameterScriptFile), externalParameterScriptFile);
-            _scriptFile = externalParameterScriptFile;
+                if (null == configuration)
+                {
+                    throw new ArgumentNullException("configuration", "configuration: Parameter validation FAILED. Parameter must not be null.");
+                }
+                _scriptFile = configuration.Get("ScriptFile");
+                if (String.IsNullOrWhiteSpace(_scriptFile))
+                {
+                    throw new ArgumentNullException("ScriptFile", "PowerShellParser.Configuration: Parameter validation FAILED. ScriptFile must not be null.");
+                }
+                _configuration = configuration;
 
-            // DFTODO: Implement this method
-            throw new NotImplementedException();
+                var externalParameterScriptFile = "";
+                if (null == externalParameterScriptFile || String.IsNullOrWhiteSpace(externalParameterScriptFile)) throw new ArgumentNullException("externalParameterScriptFile", String.Format("externalParameterScriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+                if (String.IsNullOrWhiteSpace(Path.GetDirectoryName(externalParameterScriptFile)))
+                {
+                    externalParameterScriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(externalParameterScriptFile));
+                }
+                var achFileName = Path.GetFileName(externalParameterScriptFile).ToCharArray();
+                var achFileInvalidChars = Path.GetInvalidFileNameChars();
+                if ('\0' != achFileName.Intersect(achFileInvalidChars).FirstOrDefault())
+                {
+                    throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", externalParameterScriptFile);
+                }
+                if (!File.Exists(externalParameterScriptFile)) throw new FileNotFoundException(String.Format("externalParameterScriptFile: Parameter validation FAILED. File '{0}' does not exist.", externalParameterScriptFile), externalParameterScriptFile);
+                _scriptFile = externalParameterScriptFile;
+
+                fReturn = true;
+            }
+            catch
+            {
+                fReturn = false;
+            }
+            return fReturn;
         }
     }
 }

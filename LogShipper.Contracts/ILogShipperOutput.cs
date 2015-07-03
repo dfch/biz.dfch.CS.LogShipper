@@ -8,5 +8,6 @@ namespace biz.dfch.CS.LogShipper.Contracts
     {
         NameValueCollection Configuration { get; set; }
         bool Log(String data);
+        bool UpdateConfiguration(NameValueCollection configuration);
     }
 }
