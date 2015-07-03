@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NullOutput.cs" />
-    <Compile Include="DefaultConsoleOutput.cs" />
+    <Compile Include="ConsoleOutput.cs" />
     <Compile Include="DefaultTextParser.cs" />
     <Compile Include="PowerShellParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
