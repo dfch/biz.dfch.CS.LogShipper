@@ -93,27 +93,27 @@ namespace biz.dfch.CS.LogShipper.Extensions
                 {
                     throw new ArgumentNullException("configuration", "configuration: Parameter validation FAILED. Parameter must not be null.");
                 }
-                _scriptFile = configuration.Get("ScriptFile");
-                if (String.IsNullOrWhiteSpace(_scriptFile))
+                var scriptFile = configuration.Get("ScriptFile");
+                if (String.IsNullOrWhiteSpace(scriptFile))
                 {
                     throw new ArgumentNullException("ScriptFile", "PowerShellParser.Configuration: Parameter validation FAILED. ScriptFile must not be null.");
                 }
-                _configuration = new NameValueCollection(configuration);
 
-                var externalParameterScriptFile = "";
-                if (null == externalParameterScriptFile || String.IsNullOrWhiteSpace(externalParameterScriptFile)) throw new ArgumentNullException("externalParameterScriptFile", String.Format("externalParameterScriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
-                if (String.IsNullOrWhiteSpace(Path.GetDirectoryName(externalParameterScriptFile)))
+                if (null == scriptFile || String.IsNullOrWhiteSpace(scriptFile)) throw new ArgumentNullException("scriptFile", String.Format("scriptFile: Parameter validation FAILED. Parameter cannot be null or empty."));
+                if (String.IsNullOrWhiteSpace(Path.GetDirectoryName(scriptFile)))
                 {
-                    externalParameterScriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(externalParameterScriptFile));
+                    scriptFile = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(scriptFile));
                 }
-                var achFileName = Path.GetFileName(externalParameterScriptFile).ToCharArray();
+                var achFileName = Path.GetFileName(scriptFile).ToCharArray();
                 var achFileInvalidChars = Path.GetInvalidFileNameChars();
                 if ('\0' != achFileName.Intersect(achFileInvalidChars).FirstOrDefault())
                 {
-                    throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", externalParameterScriptFile);
+                    throw new ArgumentException("ScriptFile: Parameter validation FAILED. ScriptFile name contains invalid characters.", scriptFile);
                 }
-                if (!File.Exists(externalParameterScriptFile)) throw new FileNotFoundException(String.Format("externalParameterScriptFile: Parameter validation FAILED. File '{0}' does not exist.", externalParameterScriptFile), externalParameterScriptFile);
-                _scriptFile = externalParameterScriptFile;
+                if (!File.Exists(scriptFile)) throw new FileNotFoundException(String.Format("scriptFile: Parameter validation FAILED. File '{0}' does not exist.", scriptFile), scriptFile);
+
+                _configuration = new NameValueCollection(configuration);
+                _scriptFile = scriptFile;
 
                 fReturn = true;
             }
