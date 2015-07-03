@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NullOutput.cs" />
     <Compile Include="DefaultConsoleOutput.cs" />
     <Compile Include="DefaultTextParser.cs" />
     <Compile Include="PowerShellParser.cs" />
