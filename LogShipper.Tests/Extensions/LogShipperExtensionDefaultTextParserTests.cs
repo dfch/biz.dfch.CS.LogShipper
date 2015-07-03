@@ -196,5 +196,55 @@ namespace biz.dfch.CS.LogShipper.Tests
                 Assert.AreEqual(line, list[42]);
             }
         }
+        [TestMethod]
+        public void UpdateConfigurationShouldReturnTrue()
+        {
+            // Arrange
+            var output = new DefaultTextParser();
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+
+            // Act
+            var fReturn = output.UpdateConfiguration(nameValueCollection);
+
+            // Assert
+            Assert.IsTrue(fReturn);
+            Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
+        }
+        [TestMethod]
+        public void UpdateConfigurationShouldReturnFalse()
+        {
+            // Arrange
+            var output = new DefaultTextParser();
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            output.Configuration = nameValueCollection;
+
+            // Act
+            var fReturn = output.UpdateConfiguration(null);
+
+            // Assert
+            Assert.IsFalse(fReturn);
+            Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
+        }
+        [TestMethod]
+        public void UpdateLocalConfigurationKeepsExtensionConfigurationUnchanged()
+        {
+            // Arrange
+            var output = new DefaultTextParser();
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+
+            // Act
+            output.Configuration = nameValueCollection;
+            var fReturn = output.UpdateConfiguration(nameValueCollection);
+            nameValueCollection.Add("a-new-local-name", "another-arbitrary-value");
+
+            // Assert
+            Assert.IsTrue(fReturn);
+            Assert.AreEqual(2, nameValueCollection.Count);
+            Assert.AreEqual(1, output.Configuration.Count);
+            Assert.IsFalse(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
+        }
     }
 }
