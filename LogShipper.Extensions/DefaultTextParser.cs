@@ -21,7 +21,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
             }
             set
             {
-                if (VerifyAndSetConfiguration(value))
+                if (!VerifyAndSetConfiguration(value))
                 {
                     throw new ArgumentNullException("Configuration", "DefaultTextParser.Configuration: Parameter validation FAILED. Parameter must not be null.");
                 }
@@ -87,7 +87,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
                 _configuration = new NameValueCollection(configuration);
                 fReturn = true;
             }
-            catch
+            catch(Exception ex)
             {
                 fReturn = false;
             }

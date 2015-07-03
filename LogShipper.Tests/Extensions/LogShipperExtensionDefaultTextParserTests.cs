@@ -47,9 +47,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = String.Empty;
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc;
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection;
 
             // Act
             var list = parser.Parse(data);
@@ -64,9 +64,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!";
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc;
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection;
 
             // Act
             var list = parser.Parse(data);
@@ -81,9 +81,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\n";
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc;
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection;
 
             // Act
             var list = parser.Parse(data);
@@ -98,9 +98,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc; 
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection; 
 
             // Act
             var list = parser.Parse(data);
@@ -116,9 +116,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             var data = "hello, world!\rsome more text without line break ...";
 
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc; 
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection; 
 
             // Act
             var list = parser.Parse(data);
@@ -135,9 +135,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc;
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection;
 
             // Act
             var list = parser.Parse(data);
@@ -154,9 +154,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             // Arrange
             var data = "hello, world!\r\n\nsome more text without line break ...";
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc; 
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection; 
 
             // Act
             var list = parser.Parse(data);
@@ -180,9 +180,9 @@ namespace biz.dfch.CS.LogShipper.Tests
             var data = sb.ToString();
 
             var parser = new DefaultTextParser();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            parser.Configuration = nvc; 
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            parser.Configuration = nameValueCollection; 
 
             // Act
             var list = parser.Parse(data);

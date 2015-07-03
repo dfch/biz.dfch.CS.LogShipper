@@ -55,7 +55,7 @@ namespace biz.dfch.CS.LogShipper.Extensions
                 _configuration = new NameValueCollection(configuration);
                 fReturn = true;
             }
-            catch
+            catch(Exception ex)
             {
                 fReturn = false;
             }
