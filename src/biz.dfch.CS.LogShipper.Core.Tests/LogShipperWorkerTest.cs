@@ -92,6 +92,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Start();
         }
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void DoStartEmptyThrowsArgumentNullException()
@@ -99,6 +100,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Start("", "");
         }
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void DoStartNullThrowsArgumentNullException()
@@ -106,6 +108,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Start(null, null);
         }
+        
         [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public void DoStartInvalidDirectoryThrowsDirectoryNotFoundException()
@@ -114,6 +117,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
             worker.Start("C:\\non-existent-directory\\non-existant-file.log", scriptFile);
         }
+        
         [TestMethod]
         [ExpectedException(typeof(FileNotFoundException))]
         public void DoStartInvalidScriptFileThrowsFileNotFoundException()
@@ -121,6 +125,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Start("C:\\non-existent-directory\\non-existant-file.log", "C:\\non-existent-directory\\non-existant-file.ps1");
         }
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void DoStartInvalidFileNameThrowsArgumentException()
@@ -128,6 +133,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Start("C:\\irrelevant-directory\\irrelevant-file.log", "invalid-file-???.ps1");
         }
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void DoStartInvalidDirectoryNameThrowsArgumentException()
@@ -136,6 +142,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var scriptFile = System.Configuration.ConfigurationManager.AppSettings["ScriptFile"];
             worker.Start("C:\\invalid-directory-\t\\irrelevant-file.log", scriptFile);
         }
+        
         [TestMethod]
         public void DoStartReturnsTrue()
         {
@@ -144,6 +151,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Start(logFile, System.Configuration.ConfigurationManager.AppSettings["ScriptFile"]);
             Assert.AreEqual(true, fReturn);
         }
+        
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void DoStopThrowsInvalidOperationException()
@@ -151,6 +159,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             LogShipperWorker worker = new LogShipperWorker();
             worker.Stop();
         }
+        
         [TestMethod]
         public void DoStartStopStartReturnsTrue()
         {
@@ -162,6 +171,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             fReturn = worker.Start();
             Assert.AreEqual(true, fReturn);
         }
+        
         [TestMethod]
         public void DoUpdateReturnsFalse()
         {
@@ -169,6 +179,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Update();
             Assert.AreEqual(false, fReturn);
         }
+        
         [TestMethod]
         public void DoUpdateReturnsTrue()
         {
@@ -179,6 +190,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             fReturn = worker.Update();
             Assert.AreEqual(true, fReturn);
         }
+
         [TestMethod]
         public void DoUpdateWithPathReturnsTrue()
         {
@@ -189,6 +201,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             fReturn = worker.Update(logFile, scriptFile);
             Assert.AreEqual(true, fReturn);
         }
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void DoUpdateEmptyThrowsArgumentNullException()
@@ -199,6 +212,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Start(logFile, scriptFile);
             fReturn = worker.Update("", "");
         }
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void DoUpdateNullThrowsArgumentNullException()

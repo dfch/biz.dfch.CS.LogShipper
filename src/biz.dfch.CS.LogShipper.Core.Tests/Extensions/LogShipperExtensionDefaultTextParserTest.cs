@@ -20,6 +20,7 @@ using biz.dfch.CS.LogShipper;
 using biz.dfch.CS.LogShipper.Public;
 using biz.dfch.CS.LogShipper.Extensions;
 using System.Collections.Specialized;
+using biz.dfch.CS.Utilities.Testing;
 
 namespace biz.dfch.CS.LogShipper.Core.Tests
 {
@@ -57,8 +58,10 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             // Assert
             Assert.IsNull(list);
         }
+
         [TestMethod]
-        public void ParseEmptyDataShouldReturnEmptyList()
+        [ExpectContractFailure]
+        public void ParseEmptyDataThrowsContractException()
         {
             // Arrange
             var data = String.Empty;
@@ -71,8 +74,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var list = parser.Parse(data);
             
             // Assert
-            Assert.IsNotNull(list);
-            Assert.AreEqual(0, list.Count);
+            // N/A
         }
         [TestMethod]
         public void ParseHalfLineDataShouldReturnEmptyList()
@@ -227,8 +229,10 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             Assert.IsTrue(fReturn);
             Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
         }
+        
         [TestMethod]
-        public void UpdateConfigurationShouldReturnFalse()
+        [ExpectContractFailure]
+        public void UpdateConfigurationThrowsContractException()
         {
             // Arrange
             var output = new DefaultTextParser();
@@ -240,9 +244,9 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = output.UpdateConfiguration(null);
 
             // Assert
-            Assert.IsFalse(fReturn);
-            Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
+            // N/A
         }
+
         [TestMethod]
         public void UpdateLocalConfigurationKeepsExtensionConfigurationUnchanged()
         {

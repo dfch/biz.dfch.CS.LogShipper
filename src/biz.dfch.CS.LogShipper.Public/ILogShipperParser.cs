@@ -17,10 +17,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace biz.dfch.CS.LogShipper.Public
 {
+    [ContractClass(typeof(ContractClassForILogShipperParser))]
     public interface ILogShipperParser
     {
         NameValueCollection Configuration { get; set; }

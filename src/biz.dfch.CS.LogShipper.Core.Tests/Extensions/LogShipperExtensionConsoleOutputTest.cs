@@ -20,6 +20,7 @@ using biz.dfch.CS.LogShipper;
 using biz.dfch.CS.LogShipper.Public;
 using biz.dfch.CS.LogShipper.Extensions;
 using System.Collections.Specialized;
+using biz.dfch.CS.Utilities.Testing;
 
 namespace biz.dfch.CS.LogShipper.Core.Tests
 {
@@ -28,8 +29,8 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
     public class LogShipperExtensionConsoleOutputTest
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void LogEmptyShouldThrowArgumentNullException()
+        [ExpectContractFailure]
+        public void LogEmptyThrowsContractException()
         {
             // Arrange
             String data = null;
@@ -42,8 +43,9 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = output.Log(data);
 
             // Assert
-            Assert.IsNull(fReturn);
+            // N/A
         }
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void LogUninitialisedShouldThrowArgumentNullException()
@@ -90,8 +92,10 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             Assert.IsTrue(fReturn);
             Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
         }
+
         [TestMethod]
-        public void UpdateConfigurationShouldReturnFalse()
+        [ExpectContractFailure]
+        public void UpdateConfigurationThrowsContractException()
         {
             // Arrange
             var output = new ConsoleOutput();
@@ -103,8 +107,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = output.UpdateConfiguration(null);
 
             // Assert
-            Assert.IsFalse(fReturn);
-            Assert.IsTrue(Helpers.CompareNameValueCollections(nameValueCollection, output.Configuration, false));
+            // N/A
         }
         [TestMethod]
         public void UpdateLocalConfigurationKeepsExtensionConfigurationUnchanged()

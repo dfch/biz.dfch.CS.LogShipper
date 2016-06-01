@@ -129,6 +129,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContractClassForILogShipperOutput.cs" />
+    <Compile Include="ContractClassForILogShipperParser.cs" />
     <Compile Include="ILogShipperParserData.cs" />
     <Compile Include="ILogShipperOutputData.cs" />
     <Compile Include="ILogShipperParser.cs" />
