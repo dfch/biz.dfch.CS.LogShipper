@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F2B99E39-55A1-4A1A-9C85-CF3DE002F68A}</ProjectGuid>
+    <ProjectGuid>{096DB69E-9F59-49D5-9040-55F8B2563889}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>biz.dfch.CS.LogShipper.Core.Tests</RootNamespace>
-    <AssemblyName>biz.dfch.CS.LogShipper.Core.Tests</AssemblyName>
+    <RootNamespace>biz.dfch.CS.LogShipper.Public.Tests</RootNamespace>
+    <AssemblyName>biz.dfch.CS.LogShipper.Public.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,24 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Management.Automation.6.1.7601.17515\lib\net45\System.Management.Automation.dll</HintPath>
+    <Reference Include="Telerik.JustMock">
+      <HintPath>../JustMock/Telerik.JustMock.dll</HintPath>
     </Reference>
-    <Reference Include="System.Management.Instrumentation" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -67,40 +53,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Helpers.cs" />
-    <Compile Include="Extensions\LogShipperExtensionNullOutputTest.cs" />
-    <Compile Include="Extensions\LogShipperExtensionConsoleOutputTest.cs" />
-    <Compile Include="LogBase.cs" />
-    <Compile Include="Debug.cs" />
-    <Compile Include="Trace.cs" />
-    <Compile Include="LogShipperWorkerTest.cs" />
+    <Compile Include="ILogShipperParserTest.cs" />
+    <Compile Include="ILogShipperOutputTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Extensions\LogShipperExtensionDefaultTextParserTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\biz.dfch.CS.LogShipper.Public\biz.dfch.CS.LogShipper.Public.csproj">
-      <Project>{68b1bb50-c393-4a83-aed5-9b1c13f52f48}</Project>
+      <Project>{68B1BB50-C393-4A83-AED5-9B1C13F52F48}</Project>
       <Name>biz.dfch.CS.LogShipper.Public</Name>
     </ProjectReference>
-    <ProjectReference Include="..\biz.dfch.CS.LogShipper.Extensions\biz.dfch.CS.LogShipper.Extensions.csproj">
-      <Project>{f556e6eb-5c98-4303-9c7f-fe76b78490fe}</Project>
-      <Name>biz.dfch.CS.LogShipper.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\biz.dfch.CS.LogShipper.Core\biz.dfch.CS.LogShipper.Core.csproj">
-      <Project>{f5670f7b-3b88-4ac3-8a25-469c94b8339d}</Project>
-      <Name>biz.dfch.CS.LogShipper.Core</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="LogShipper.Tests.dll.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-    <None Include="some-script.ps1">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

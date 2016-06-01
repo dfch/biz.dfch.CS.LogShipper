@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "biz.dfch.CS.LogShipper.Exte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "biz.dfch.CS.LogShipper.Public", "biz.dfch.CS.LogShipper.Public\biz.dfch.CS.LogShipper.Public.csproj", "{68B1BB50-C393-4A83-AED5-9B1C13F52F48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "biz.dfch.CS.LogShipper.Public.Tests", "biz.dfch.CS.LogShipper.Public.Tests\biz.dfch.CS.LogShipper.Public.Tests.csproj", "{096DB69E-9F59-49D5-9040-55F8B2563889}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
