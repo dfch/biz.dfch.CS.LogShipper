@@ -26,7 +26,7 @@ using biz.dfch.CS.Utilities.Testing;
 namespace biz.dfch.CS.LogShipper.Core.Tests
 {
     [TestClass]
-    [DeploymentItem("LogShipper.Tests.dll.config")]
+    [DeploymentItem("biz.dfch.CS.LogShipper.Core.Tests.dll.config")]
     public class LogShipperExtensionNullOutputTest
     {
         [TestMethod]

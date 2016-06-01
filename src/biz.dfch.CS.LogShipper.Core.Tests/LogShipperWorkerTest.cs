@@ -22,11 +22,11 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using biz.dfch.CS.LogShipper.Core;
 
-[assembly: log4net.Config.XmlConfigurator(ConfigFile = "LogShipper.Tests.dll.config", Watch = true)]
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "biz.dfch.CS.LogShipper.Core.Tests.dll.config", Watch = true)]
 namespace biz.dfch.CS.LogShipper.Core.Tests
 {
     [TestClass]
-    [DeploymentItem("LogShipper.Tests.dll.config")]
+    [DeploymentItem("biz.dfch.CS.LogShipper.Core.Tests.dll.config")]
     public class LogShipperWorkerTest
     {
         private static TestContext _testContext;
@@ -223,6 +223,8 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Start(logFile, scriptFile);
             fReturn = worker.Update(null, null);
         }
+
+        [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public void DoUpdateInvalidDirectoryThrowsDirectoryNotFoundException()
         {
@@ -232,6 +234,8 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Start(logFile, scriptFile);
             fReturn = worker.Update("C:\\non-existent-directory\\non-existant-file.log", scriptFile);
         }
+        
+        [TestMethod]
         [ExpectedException(typeof(FileNotFoundException))]
         public void DoUpdateInvalidScriptFileThrowsFileNotFoundException()
         {
@@ -241,6 +245,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
             var fReturn = worker.Start(logFile, scriptFile);
             fReturn = worker.Update(logFile, "C:\\non-existent-directory\\non-existant-file.ps1");
         }
+        
         [TestMethod]
         public void DoAppendText()
         {
@@ -275,6 +280,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
                 }
             }
         }
+        
         [TestMethod]
         public void DoAppendText2()
         {
@@ -309,6 +315,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
                 }
             }
         }
+        
         [TestMethod]
         public void DoRenameFile()
         {
@@ -360,6 +367,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
                 }
             }
         }
+        
         [TestMethod]
         public void DoAppendManyLines()
         {
@@ -403,6 +411,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
                 }
             }
         }
+        
         [TestMethod]
         [ExpectedException(typeof(TimeoutException))]
         public void DoAppendManyLinesThrowsTimeoutException()
@@ -447,13 +456,5 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
                 }
             }
         }
-        //[TestMethod]
-        //public void DoTestPowershellCreate()
-        //{
-        //    for(var c = 0; c < 1000*1000*10; c++)
-        //    {
-        //         PowerShell ps = PowerShell.Create();
-        //    }
-        //}
     }
 }
