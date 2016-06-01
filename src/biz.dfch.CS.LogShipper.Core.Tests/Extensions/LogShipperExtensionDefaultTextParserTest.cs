@@ -9,7 +9,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
 {
     [TestClass]
     [DeploymentItem("LogShipper.Tests.dll.config")]
-    public class LogShipperExtensionDefaultTextParserTests
+    public class LogShipperExtensionDefaultTextParserTest
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]

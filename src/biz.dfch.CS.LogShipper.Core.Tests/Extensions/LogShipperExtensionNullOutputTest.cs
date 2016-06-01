@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using biz.dfch.CS.LogShipper;
 using biz.dfch.CS.LogShipper.Public;
@@ -9,7 +10,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
 {
     [TestClass]
     [DeploymentItem("LogShipper.Tests.dll.config")]
-    public class LogShipperExtensionConsoleOutputTests
+    public class LogShipperExtensionNullOutputTest
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -17,10 +18,10 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         {
             // Arrange
             String data = null;
-            var output = new ConsoleOutput();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            output.Configuration = nvc;
+            var output = new NullOutput();
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            output.Configuration = nameValueCollection;
 
             // Act
             var fReturn = output.Log(data);
@@ -34,7 +35,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         {
             // Arrange
             var data = "hello, world!";
-            var output = new ConsoleOutput();
+            var output = new NullOutput();
             output.Configuration = null;
 
             // Act
@@ -48,10 +49,10 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         {
             // Arrange
             var data = "Hello, world!";
-            var output = new ConsoleOutput();
-            var nvc = new NameValueCollection();
-            nvc.Add("arbitrary-name", "arbitrary-value");
-            output.Configuration = nvc;
+            var output = new NullOutput();
+            var nameValueCollection = new NameValueCollection();
+            nameValueCollection.Add("arbitrary-name", "arbitrary-value");
+            output.Configuration = nameValueCollection;
 
             // Act
             var fReturn = output.Log(data);
@@ -63,7 +64,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         public void UpdateConfigurationShouldReturnTrue()
         {
             // Arrange
-            var output = new ConsoleOutput();
+            var output = new NullOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
 
@@ -78,7 +79,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         public void UpdateConfigurationShouldReturnFalse()
         {
             // Arrange
-            var output = new ConsoleOutput();
+            var output = new NullOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
             output.Configuration = nameValueCollection;
@@ -94,7 +95,7 @@ namespace biz.dfch.CS.LogShipper.Core.Tests
         public void UpdateLocalConfigurationKeepsExtensionConfigurationUnchanged()
         {
             // Arrange
-            var output = new ConsoleOutput();
+            var output = new NullOutput();
             var nameValueCollection = new NameValueCollection();
             nameValueCollection.Add("arbitrary-name", "arbitrary-value");
 

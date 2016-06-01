@@ -68,14 +68,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Helpers.cs" />
-    <Compile Include="Extensions\LogShipperExtensionNullOutputTests.cs" />
-    <Compile Include="Extensions\LogShipperExtensionConsoleOutputTests.cs" />
+    <Compile Include="Extensions\LogShipperExtensionNullOutputTest.cs" />
+    <Compile Include="Extensions\LogShipperExtensionConsoleOutputTest.cs" />
     <Compile Include="LogBase.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Trace.cs" />
-    <Compile Include="Service\LogShipperTests.cs" />
+    <Compile Include="LogShipperWorkerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Extensions\LogShipperExtensionDefaultTextParserTests.cs" />
+    <Compile Include="Extensions\LogShipperExtensionDefaultTextParserTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\biz.dfch.CS.LogShipper.Public\biz.dfch.CS.LogShipper.Public.csproj">
